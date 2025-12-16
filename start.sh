@@ -75,6 +75,10 @@ npx prisma generate 2>/dev/null || npm install prisma @prisma/client
 # Применение миграций
 npx prisma db push --accept-data-loss 2>/dev/null || echo "⚠️  Проверьте подключение к БД"
 
+# Добавление тестовых данных
+echo "🌱 Добавление тестовых постов..."
+node seed.js 2>/dev/null || echo "⚠️  Не удалось добавить тестовые данные"
+
 cd ..
 
 # Запуск backend в фоне

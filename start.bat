@@ -59,6 +59,9 @@ echo 🔧 Настройка базы данных...
 call npx prisma generate 2>nul
 call npx prisma db push --accept-data-loss 2>nul
 
+echo 🌱 Добавление тестовых постов...
+call node seed.js 2>nul
+
 cd ..
 
 echo 🔧 Запуск backend сервера...
