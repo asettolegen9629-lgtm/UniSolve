@@ -1,9 +1,5 @@
-// Authentication middleware for Clerk integration
-// This middleware extracts user info from Clerk custom headers
-
 const authenticateUser = async (req, res, next) => {
   try {
-    // Extract user info from custom Clerk headers
     const clerkUserId = req.headers['x-clerk-user-id'];
     const clerkEmail = req.headers['x-clerk-email'];
     const clerkUsername = req.headers['x-clerk-username'];
@@ -13,7 +9,6 @@ const authenticateUser = async (req, res, next) => {
       return res.status(401).json({ error: 'User ID not provided' });
     }
     
-    // Attach user info to request
     req.user = {
       clerkId: clerkUserId,
       email: clerkEmail,
@@ -28,20 +23,25 @@ const authenticateUser = async (req, res, next) => {
   }
 };
 
-// Middleware to check if user is admin
 const isAdmin = async (req, res, next) => {
   try {
-    const { PrismaClient } = require('@prisma/client');
-    const prisma = new PrismaClient();
+    const prisma = require('../prismaClient');
+    
+    console.log('isAdmin check - clerkId:', req.user?.clerkId);
     
     const user = await prisma.user.findUnique({
       where: { clerkId: req.user.clerkId }
     });
     
+    console.log('isAdmin check - user found:', user ? 'YES' : 'NO');
+    console.log('isAdmin check - isAdmin:', user?.isAdmin);
+    
     if (!user || !user.isAdmin) {
+      console.log('isAdmin check - ACCESS DENIED');
       return res.status(403).json({ error: 'Admin access required' });
     }
     
+    console.log('isAdmin check - ACCESS GRANTED');
     req.user.dbUser = user;
     next();
   } catch (error) {

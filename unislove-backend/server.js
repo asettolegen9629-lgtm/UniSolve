@@ -6,7 +6,6 @@ const fs = require('fs');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// CORS configuration - allow all origins for development
 app.use(cors({
   origin: '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -17,7 +16,6 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Logging middleware for debugging
 app.use((req, res, next) => {
   console.log(`${req.method} ${req.path}`, {
     headers: {
@@ -28,35 +26,31 @@ app.use((req, res, next) => {
   next();
 });
 
-// Serve uploaded images
 app.use('/uploads', express.static('uploads'));
 
-// Ensure uploads directory exists
 const uploadsDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
-// Import routes
 const userRoutes = require('./routes/users');
 const reportRoutes = require('./routes/reports');
 const commentRoutes = require('./routes/comments');
 const likeRoutes = require('./routes/likes');
 const notificationRoutes = require('./routes/notifications');
+const feedbackRoutes = require('./routes/feedback');
 
-// Routes
 app.use('/api/users', userRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/comments', commentRoutes);
 app.use('/api/likes', likeRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/feedback', feedbackRoutes);
 
-// Health check
 app.get('/health', (req, res) => {
   res.json({ status: 'OK', message: 'Server is running' });
 });
 
-// Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(err.status || 500).json({

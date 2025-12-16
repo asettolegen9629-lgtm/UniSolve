@@ -1,27 +1,19 @@
 const express = require('express');
 const router = express.Router();
-const { authenticateUser } = require('../middleware/auth');
+const { authenticateUser, isAdmin } = require('../middleware/auth');
 const {
   getOrCreateUser,
   getUserById,
   updateUser,
-  getCurrentUser
+  getCurrentUser,
+  getAllUsers,
+  makeUserAdmin
 } = require('../controllers/usersController');
-
-// All routes require authentication
 router.use(authenticateUser);
-
-// Get or create user (called on login)
 router.post('/sync', getOrCreateUser);
-
-// Get current user
 router.get('/me', getCurrentUser);
-
-// Get user by ID
+router.get('/admin/all', isAdmin, getAllUsers);
+router.put('/admin/:id/make-admin', isAdmin, makeUserAdmin);
 router.get('/:id', getUserById);
-
-// Update user profile
 router.put('/me', updateUser);
-
 module.exports = router;
-

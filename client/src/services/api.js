@@ -85,6 +85,15 @@ export const usersAPI = {
     const response = await api.put('/users/me', data);
     return response.data;
   },
+  // Admin methods
+  getAll: async () => {
+    const response = await api.get('/users/admin/all');
+    return response.data;
+  },
+  makeAdmin: async (id, isAdmin) => {
+    const response = await api.put(`/users/admin/${id}/make-admin`, { isAdmin });
+    return response.data;
+  },
 };
 
 // Reports API
@@ -113,12 +122,33 @@ export const reportsAPI = {
     const response = await api.put(`/reports/${id}/status`, { status, isVerified });
     return response.data;
   },
+  verify: async (id, isVerified) => {
+    const response = await api.put(`/reports/${id}/status`, { isVerified });
+    return response.data;
+  },
   rate: async (id, rating) => {
     const response = await api.put(`/reports/${id}/rate`, { rating });
     return response.data;
   },
   rateByUser: async (id, rating) => {
     const response = await api.put(`/reports/${id}/user-rating`, { rating });
+    return response.data;
+  },
+  // Admin methods
+  getAllForAdmin: async () => {
+    const response = await api.get('/reports/admin/all');
+    return response.data;
+  },
+  getAdminStatistics: async () => {
+    const response = await api.get('/reports/admin/statistics');
+    return response.data;
+  },
+  approve: async (id, approve = true) => {
+    const response = await api.put(`/reports/${id}/approve`, { isApproved: approve });
+    return response.data;
+  },
+  delete: async (id) => {
+    const response = await api.delete(`/reports/${id}`);
     return response.data;
   },
 };
@@ -175,6 +205,44 @@ export const notificationsAPI = {
   },
   markAllAsRead: async () => {
     const response = await api.put('/notifications/read-all');
+    return response.data;
+  },
+  // Admin methods
+  getAdminNotifications: async () => {
+    const response = await api.get('/notifications/admin/all');
+    return response.data;
+  },
+  getAdminUnreadCount: async () => {
+    const response = await api.get('/notifications/admin/unread-count');
+    return response.data;
+  },
+  markAdminNotificationAsRead: async (id) => {
+    const response = await api.put(`/notifications/admin/${id}/read`);
+    return response.data;
+  },
+};
+
+// Feedback API
+export const feedbackAPI = {
+  create: async (message, type, reportId = null) => {
+    const response = await api.post('/feedback', { message, type, reportId });
+    return response.data;
+  },
+  getByReport: async (reportId) => {
+    const response = await api.get(`/feedback/report/${reportId}`);
+    return response.data;
+  },
+  // Admin methods
+  getAllForAdmin: async () => {
+    const response = await api.get('/feedback/admin/all');
+    return response.data;
+  },
+  getStatistics: async () => {
+    const response = await api.get('/feedback/admin/statistics');
+    return response.data;
+  },
+  markAsRead: async (id) => {
+    const response = await api.put(`/feedback/admin/${id}/read`);
     return response.data;
   },
 };

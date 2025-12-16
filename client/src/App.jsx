@@ -9,6 +9,14 @@ import Report from './pages/Report'
 import {useUser} from '@clerk/clerk-react'
 import Layout from './pages/Layout'
 import { setClerkHeaders } from './services/api'
+// Admin pages
+import AdminLayout from './pages/Admin/AdminLayout'
+import AdminDashboard from './pages/Admin/Dashboard'
+import AdminManageReports from './pages/Admin/ManageReports'
+import AdminManageUsers from './pages/Admin/ManageUsers'
+import AdminProfile from './pages/Admin/AdminProfile'
+import AdminFeedback from './pages/Admin/AdminFeedback'
+import AdminNotifications from './pages/Admin/AdminNotifications'
 
 const App = () => {
   const {user} = useUser()
@@ -34,6 +42,15 @@ const App = () => {
         <Route path='feedback' element={<Feedback/>}/>
         <Route path='profile' element={<Profile/>}/>
         <Route path='new-report' element={<Report/>}/>
+      </Route>
+      {/* Admin Routes */}
+      <Route path='/admin' element={!user? <Login />:<AdminLayout/>}>
+        <Route index element={<AdminDashboard/>}/>
+        <Route path='reports' element={<AdminManageReports/>}/>
+        <Route path='users' element={<AdminManageUsers/>}/>
+        <Route path='notifications' element={<AdminNotifications/>}/>
+        <Route path='feedback' element={<AdminFeedback/>}/>
+        <Route path='profile' element={<AdminProfile/>}/>
       </Route>
     </Routes>
     </>

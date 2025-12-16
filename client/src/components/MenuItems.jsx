@@ -1,22 +1,28 @@
 import React, { useState, useEffect } from 'react'
 import { menuItemsData } from '../assets/assets'
 import { NavLink } from 'react-router-dom'
-import { notificationsAPI } from '../services/api'
+import { notificationsAPI, usersAPI } from '../services/api'
 import { useUser } from '@clerk/clerk-react'
+import { Shield } from 'lucide-react'
 
 const MenuItems = ({setSidebarOpen}) => {
   const [unreadCount, setUnreadCount] = useState(0)
+  const [isAdmin, setIsAdmin] = useState(false)
   const { user: clerkUser } = useUser()
 
   useEffect(() => {
     if (clerkUser) {
       fetchUnreadCount()
+      checkAdminStatus()
       // Refresh count every 30 seconds
       const interval = setInterval(fetchUnreadCount, 30000)
+      // Refresh admin status every 10 seconds (in case it was changed)
+      const adminInterval = setInterval(checkAdminStatus, 10000)
       const onUpdated = () => fetchUnreadCount()
       window.addEventListener('notifications-updated', onUpdated)
       return () => {
         clearInterval(interval)
+        clearInterval(adminInterval)
         window.removeEventListener('notifications-updated', onUpdated)
       }
     }
@@ -28,6 +34,20 @@ const MenuItems = ({setSidebarOpen}) => {
       setUnreadCount(data.count || 0)
     } catch (error) {
       console.error('Error fetching unread count:', error)
+    }
+  }
+
+  const checkAdminStatus = async () => {
+    try {
+      const userData = await usersAPI.getCurrent()
+      console.log('Admin check - User data:', userData)
+      console.log('Admin check - isAdmin value:', userData?.isAdmin)
+      const adminStatus = userData?.isAdmin === true
+      setIsAdmin(adminStatus)
+      console.log('Admin check - Setting isAdmin to:', adminStatus)
+    } catch (error) {
+      console.error('Error checking admin status:', error)
+      setIsAdmin(false)
     }
   }
 
@@ -52,6 +72,23 @@ const MenuItems = ({setSidebarOpen}) => {
            </NavLink>
         ))
        }
+       {/* Admin Panel Link - Only visible to admins */}
+       {isAdmin && (
+         <NavLink 
+           to="/admin" 
+           onClick={()=>setSidebarOpen(false)} 
+           className={({isActive})=>`px-3.5 py-2 flex items-center gap-3 rounded-xl relative mt-2 ${isActive ? 'bg-purple-100 text-purple-700' : 'hover:bg-purple-50 text-purple-600'}`}
+         >
+           <Shield className="w-5 h-5"/>
+           Admin Panel
+         </NavLink>
+       )}
+       {/* Debug: Show admin status */}
+       {process.env.NODE_ENV === 'development' && (
+         <div className="px-3.5 py-1 text-xs text-gray-400">
+           Admin: {isAdmin ? 'Yes' : 'No'}
+         </div>
+       )}
     </div>
   )
 }

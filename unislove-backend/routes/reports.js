@@ -12,10 +12,11 @@ const {
   rateReport,
   rateReportByUser,
   approveReport,
-  getPendingReports
+  getPendingReports,
+  getAllReportsForAdmin,
+  getAdminStatistics,
+  deleteReport
 } = require('../controllers/reportsController');
-
-// Configure multer for file uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, 'uploads/');
@@ -25,15 +26,13 @@ const storage = multer.diskStorage({
     cb(null, uniqueSuffix + path.extname(file.originalname));
   }
 });
-
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+limits: { fileSize: 10 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     const allowedTypes = /jpeg|jpg|png|gif|webp/;
     const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
     const mimetype = allowedTypes.test(file.mimetype);
-    
     if (mimetype && extname) {
       return cb(null, true);
     } else {
@@ -41,30 +40,17 @@ const upload = multer({
     }
   }
 });
-
-// Get all reports (public)
 router.get('/', getAllReports);
-
-// Get report by ID (public)
+router.get('/admin/all', authenticateUser, isAdmin, getAllReportsForAdmin);
+router.get('/admin/pending', authenticateUser, isAdmin, getPendingReports);
+router.get('/admin/statistics', authenticateUser, isAdmin, getAdminStatistics);
 router.get('/:id', getReportById);
-
-// Create report
 router.post('/', upload.array('images', 10), createReport);
-
-// All routes below require authentication
 router.use(authenticateUser);
-
-// Get current user's reports
 router.get('/user/me', getReportsByUser);
-
-// User rates their own report (must be authenticated and own the report)
 router.put('/:id/user-rating', rateReportByUser);
-
-// Admin routes
-router.get('/admin/pending', isAdmin, getPendingReports); // Get pending reports
 router.put('/:id/status', isAdmin, updateReportStatus);
 router.put('/:id/rate', isAdmin, rateReport);
-router.put('/:id/approve', isAdmin, approveReport); // Approve or reject report
-
+router.put('/:id/approve', isAdmin, approveReport);
+router.delete('/:id', isAdmin, deleteReport);
 module.exports = router;
-

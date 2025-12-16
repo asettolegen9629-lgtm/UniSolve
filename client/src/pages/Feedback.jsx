@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { reportsAPI } from "../services/api";
+import { reportsAPI, feedbackAPI } from "../services/api";
 import { Loading } from "../components/Loading";
-import { Star } from "lucide-react";
+import { Star, MessageSquare, Send } from "lucide-react";
 import toast from "react-hot-toast";
 
 const styles = {
@@ -201,8 +201,33 @@ const FeedbackCard = ({
   userRating,
   onRatingUpdate
 }) => {
+  const [showFeedbackForm, setShowFeedbackForm] = useState(false);
+  const [feedbackMessage, setFeedbackMessage] = useState('');
+  const [feedbackType, setFeedbackType] = useState('problem_solved');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const handleRatingChange = (newRating) => {
     onRatingUpdate(reportId, newRating);
+  };
+
+  const handleSendFeedback = async () => {
+    if (!feedbackMessage.trim()) {
+      toast.error('Please enter a message');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await feedbackAPI.create(feedbackMessage, feedbackType, reportId);
+      toast.success('Feedback sent to admin!');
+      setFeedbackMessage('');
+      setShowFeedbackForm(false);
+    } catch (error) {
+      console.error('Error sending feedback:', error);
+      toast.error('Failed to send feedback');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -248,6 +273,76 @@ const FeedbackCard = ({
           onRatingChange={handleRatingChange}
         />
       </div>
+
+      {/* Send Feedback Button */}
+      <button
+        onClick={() => setShowFeedbackForm(!showFeedbackForm)}
+        style={{
+          ...styles.rateButton,
+          backgroundColor: showFeedbackForm ? '#f57c00' : '#E65100',
+          marginTop: '10px',
+        }}
+      >
+        <MessageSquare size={16} style={{ marginRight: '8px', display: 'inline' }} />
+        {showFeedbackForm ? 'Cancel' : 'Send Feedback to Admin'}
+      </button>
+
+      {/* Feedback Form */}
+      {showFeedbackForm && (
+        <div style={{ marginTop: '15px', padding: '15px', backgroundColor: '#f9f9f9', borderRadius: '6px' }}>
+          <div style={{ marginBottom: '10px' }}>
+            <label style={{ fontSize: '14px', color: '#555', fontWeight: 500, display: 'block', marginBottom: '5px' }}>
+              Feedback Type:
+            </label>
+            <select
+              value={feedbackType}
+              onChange={(e) => setFeedbackType(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '8px',
+                border: '1px solid #ddd',
+                borderRadius: '4px',
+                fontSize: '14px',
+              }}
+            >
+              <option value="problem_solved">Problem solved</option>
+              <option value="still_have_question">I still have question</option>
+              <option value="help_again">Help me again, please</option>
+            </select>
+          </div>
+          <div style={{ marginBottom: '10px' }}>
+            <label style={{ fontSize: '14px', color: '#555', fontWeight: 500, display: 'block', marginBottom: '5px' }}>
+              Message:
+            </label>
+            <textarea
+              value={feedbackMessage}
+              onChange={(e) => setFeedbackMessage(e.target.value)}
+              placeholder="Write your feedback message..."
+              style={{
+                width: '100%',
+                padding: '8px',
+                border: '1px solid #ddd',
+                borderRadius: '4px',
+                fontSize: '14px',
+                minHeight: '80px',
+                resize: 'vertical',
+              }}
+            />
+          </div>
+          <button
+            onClick={handleSendFeedback}
+            disabled={isSubmitting || !feedbackMessage.trim()}
+            style={{
+              ...styles.rateButton,
+              backgroundColor: isSubmitting || !feedbackMessage.trim() ? '#ccc' : '#4caf50',
+              cursor: isSubmitting || !feedbackMessage.trim() ? 'not-allowed' : 'pointer',
+            }}
+          >
+            <Send size={16} style={{ marginRight: '8px', display: 'inline' }} />
+            {isSubmitting ? 'Sending...' : 'Send Feedback'}
+          </button>
+        </div>
+      )}
     </div>
   );
 };
