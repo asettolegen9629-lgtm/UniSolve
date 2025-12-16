@@ -1,62 +1,46 @@
 # UniSolve Project
 
-## Быстрый старт
+## 🚀 Быстрый запуск
 
-### Автоматическая установка (рекомендуется)
-
-**Для macOS/Linux:**
+### macOS/Linux:
 ```bash
-./setup.sh
+./start.sh
 ```
 
-**Для Windows:**
+### Windows:
 ```bash
-setup.bat
+start.bat
 ```
 
-Скрипт автоматически:
-- ✅ Установит все зависимости
-- ✅ Создаст .env файлы с нужными настройками
-- ✅ Настроит базу данных
+**Всё!** Сайт автоматически запустится на http://localhost:5173
 
-### Ручная установка
+## 📋 Требования
 
-1. **Установите зависимости:**
-   ```bash
-   cd client && npm install
-   cd ../unislove-backend && npm install
-   ```
+- **Node.js** - [Скачать](https://nodejs.org/)
+- **PostgreSQL** - [Скачать](https://www.postgresql.org/download/)
 
-2. **Создайте .env файлы** (скрипт делает это автоматически):
-   - `client/.env` - уже настроен в скрипте
-   - `unislove-backend/.env` - уже настроен в скрипте
+### Установка PostgreSQL:
 
-3. **Настройте базу данных:**
-   ```bash
-   cd unislove-backend
-   npx prisma generate
-   npx prisma db push
-   ```
-
-### Запуск проекта
-
-**Терминал 1 - Backend:**
+**macOS:**
 ```bash
-cd unislove-backend
-npm start
+brew install postgresql@14
+brew services start postgresql@14
 ```
 
-**Терминал 2 - Frontend:**
+**Windows:**
+Скачайте установщик с [postgresql.org](https://www.postgresql.org/download/windows/) и установите
+
+**Linux:**
 ```bash
-cd client
-npm run dev
+sudo apt install postgresql
+sudo systemctl start postgresql
 ```
 
-Откройте в браузере адрес, который покажет Vite (обычно http://localhost:5173)
+## ✅ Что делает скрипт автоматически:
 
-## Требования
+- ✅ Устанавливает все зависимости
+- ✅ Создает нужные файлы настроек
+- ✅ Настраивает базу данных
+- ✅ Запускает backend и frontend
 
-- Node.js (v16 или выше)
-- PostgreSQL (запущен и база данных `unislove_db` создана)
-- npm или yarn
-
+**Просто запустите скрипт и всё заработает!**
