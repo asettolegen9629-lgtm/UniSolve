@@ -1,0 +1,129 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(uuid())
+  clerkId       String    @unique // Clerk user ID
+  email         String    @unique
+  username      String    @unique
+  fullName      String
+  profilePicture String?  // URL to profile picture
+  password      String?   // Hashed password (if not using Clerk)
+  isAdmin       Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  reports       Report[]
+  comments      Comment[]
+  reportLikes   ReportLike[]
+  commentLikes  CommentLike[]
+  notifications Notification[]
+  
+  @@map("users")
+}
+
+model Report {
+  id          String    @id @default(uuid())
+  description String    // Content/description of the problem
+  category    String    // Category of the problem
+  status      String    @default("in-progress") // in-progress, done
+  adminRating Int?      // 1-5 stars rating by admin
+  userRating  Int?      // 1-5 stars rating by student (user who created the report)
+  isVerified  Boolean   @default(false) // Admin verification
+  isApproved  Boolean   @default(false) // Admin approval for publication
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  images      ReportImage[]
+  comments    Comment[]
+  likes       ReportLike[]
+  notifications Notification[]
+  
+  @@map("reports")
+}
+
+model ReportImage {
+  id       String  @id @default(uuid())
+  url      String  // URL to the image
+  reportId String
+  report   Report  @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  
+  @@map("report_images")
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  reportId  String
+  report    Report   @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  
+  // Reply functionality
+  parentCommentId String?
+  parentComment   Comment?  @relation("CommentReplies", fields: [parentCommentId], references: [id], onDelete: Cascade)
+  replies         Comment[] @relation("CommentReplies")
+  
+  likes     CommentLike[]
+  notifications Notification[]
+  
+  @@map("comments")
+}
+
+model ReportLike {
+  id       String  @id @default(uuid())
+  userId   String
+  user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reportId String
+  report   Report  @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, reportId])
+  @@map("report_likes")
+}
+
+model CommentLike {
+  id        String  @id @default(uuid())
+  userId    String
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  commentId String
+  comment   Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, commentId])
+  @@map("comment_likes")
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  type      String   // "report_liked", "report_commented", "comment_liked", "report_verified", "report_rated", "status_changed"
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Optional: reference to the related report/comment
+  reportId  String?
+  report    Report?  @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  
+  commentId String?
+  comment   Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  
+  @@map("notifications")
+}

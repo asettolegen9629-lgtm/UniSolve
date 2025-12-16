@@ -1,0 +1,26 @@
+{
+  "name": "unislove-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "DATABASE_URL=\"postgresql://postgres:postgres@localhost:5432/unislove_db?schema=public\" PORT=3000 node server.js",
+    "admin": "DATABASE_URL=\"postgresql://postgres:postgres@localhost:5432/unislove_db?schema=public\" PORT=3000 node admin-console.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@prisma/client": "^6.19.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "multer": "^1.4.5-lts.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.11",
+    "prisma": "^6.19.0"
+  }
+}
