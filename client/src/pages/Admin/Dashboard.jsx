@@ -123,34 +123,35 @@ const Dashboard = () => {
       {/* Charts and Table */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Reports by Categories Chart */}
-        <div className="bg-white rounded-xl shadow-md p-6">
+        <div className="bg-white rounded-xl shadow-md p-6 overflow-hidden">
           <h2 className="text-xl font-bold text-gray-900 mb-4">Reports by Categories</h2>
-          <div className="space-y-6">
-            <div className="flex items-end gap-4 h-64">
+          <div className="space-y-4">
+            <div className="flex items-end gap-4 h-48 overflow-hidden border border-gray-200 rounded-lg p-4 bg-gray-50">
               {statistics.byCategory.slice(0, 3).map((item, index) => {
                 const height = (item.count / maxCategoryCount) * 100;
                 const colors = ['#8B4513', '#FFA500', '#FFB6C1'];
                 const color = colors[index] || '#8B4513';
                 
                 return (
-                  <div key={item.category} className="flex-1 flex flex-col items-center">
-                    <div className="w-full flex flex-col items-center justify-end" style={{ height: '240px' }}>
+                  <div key={item.category} className="flex-1 flex flex-col items-center h-full max-h-full">
+                    <div className="w-full flex flex-col items-center justify-end flex-1 min-h-0" style={{ maxHeight: '160px' }}>
                       <div
                         className="w-full rounded-t transition-all duration-500"
                         style={{ 
-                          height: `${height}%`,
+                          height: `${Math.min(height, 100)}%`,
                           backgroundColor: color,
-                          minHeight: height > 0 ? '20px' : '0'
+                          minHeight: height > 0 ? '20px' : '0',
+                          maxHeight: '100%'
                         }}
                       ></div>
                     </div>
-                    <div className="mt-2 text-sm font-medium text-gray-700">{item.category}</div>
+                    <div className="mt-2 text-xs font-medium text-gray-700 truncate w-full text-center">{item.category}</div>
                     <div className="text-xs text-gray-500">{item.count}</div>
                   </div>
                 );
               })}
             </div>
-            <div className="flex items-center gap-2 mt-4">
+            <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-blue-500 rounded"></div>
               <span className="text-sm text-gray-600">amount of reports</span>
             </div>
