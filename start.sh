@@ -65,33 +65,15 @@ fi
 # Создание .env для backend (ВСЕГДА проверяем)
 if [ ! -f ".env" ]; then
     echo "📝 Создание .env для backend..."
-    echo "   Используется облачная БД (Supabase) - все видят одни посты!"
-    cat > .env << 'EOF'
-DATABASE_URL="postgresql://postgres.unislove:YOUR_PASSWORD@aws-0-us-west-1.pooler.supabase.com:6543/postgres"
-PORT=3000
-EOF
-    echo ""
-    echo "⚠️  ВАЖНО: Нужно настроить облачную БД один раз!"
-    echo "   1. Откройте https://supabase.com и создайте бесплатный аккаунт"
-    echo "   2. Создайте новый проект"
-    echo "   3. Скопируйте строку подключения из Settings → Database"
-    echo "   4. Вставьте её в unislove-backend/.env вместо DATABASE_URL"
-    echo ""
-    echo "   Или используйте локальную БД (каждый видит свои посты):"
-    echo "   DATABASE_URL=\"postgresql://postgres:postgres@localhost:5432/unislove_db?schema=public\""
-    echo ""
-    read -p "   Продолжить с локальной БД? (y/n) " -n 1 -r
-    echo
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        cat > .env << EOF
+    cat > .env << EOF
 DATABASE_URL="postgresql://postgres:postgres@localhost:5432/unislove_db?schema=public"
 PORT=3000
 EOF
-        echo "✅ Используется локальная БД"
-    else
-        echo "⚠️  Настройте облачную БД в unislove-backend/.env перед запуском!"
-        exit 1
-    fi
+    echo "✅ .env файл создан (локальная БД)"
+    echo ""
+    echo "💡 Хотите чтобы ВСЕ видели одни посты?"
+    echo "   См. инструкцию: SETUP_SHARED_DB.txt"
+    echo "   Или: QUICK_SETUP.md"
 else
     # Проверяем что DATABASE_URL есть
     if ! grep -q "DATABASE_URL" .env; then
