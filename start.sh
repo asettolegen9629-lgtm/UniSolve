@@ -25,13 +25,8 @@ fi
 # Установка зависимостей для frontend (ВСЕГДА)
 echo "📦 Установка зависимостей для frontend..."
 cd client
-if [ ! -d "node_modules" ] || [ ! -f "package-lock.json" ]; then
-    echo "   Установка npm пакетов..."
-    npm install
-else
-    echo "   Проверка зависимостей..."
-    npm install
-fi
+echo "   Установка npm пакетов (это может занять несколько минут)..."
+npm install --silent || npm install
 
 # Создание .env для frontend (ВСЕГДА проверяем)
 if [ ! -f ".env" ]; then
@@ -54,13 +49,8 @@ cd ..
 # Установка зависимостей для backend (ВСЕГДА)
 echo "📦 Установка зависимостей для backend..."
 cd unislove-backend
-if [ ! -d "node_modules" ] || [ ! -f "package-lock.json" ]; then
-    echo "   Установка npm пакетов..."
-    npm install
-else
-    echo "   Проверка зависимостей..."
-    npm install
-fi
+echo "   Установка npm пакетов (это может занять несколько минут)..."
+npm install --silent || npm install
 
 # Создание .env для backend (ВСЕГДА проверяем)
 if [ ! -f ".env" ]; then
