@@ -207,7 +207,7 @@ const ManageReports = () => {
     [reports]
   );
   const solvedCount = useMemo(() => 
-    reports.filter(r => r.status === 'done').length, 
+    reports.filter(r => r.isApproved && r.status === 'done').length, 
     [reports]
   );
   const totalCount = reports.length;
