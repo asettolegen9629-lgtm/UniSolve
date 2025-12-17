@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Search, Filter, Edit, Eye, Trash2, Check, X, Star, Shield, CheckCircle2, Plus } from 'lucide-react';
 import { reportsAPI } from '../../services/api';
 import toast from 'react-hot-toast';
