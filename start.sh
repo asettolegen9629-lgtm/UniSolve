@@ -70,10 +70,6 @@ DATABASE_URL="postgresql://postgres:postgres@localhost:5432/unislove_db?schema=p
 PORT=3000
 EOF
     echo "✅ .env файл создан (локальная БД)"
-    echo ""
-    echo "💡 Хотите чтобы ВСЕ видели одни посты?"
-    echo "   См. инструкцию: SETUP_SHARED_DB.txt"
-    echo "   Или: QUICK_SETUP.md"
 else
     # Проверяем что DATABASE_URL есть
     if ! grep -q "DATABASE_URL" .env; then
