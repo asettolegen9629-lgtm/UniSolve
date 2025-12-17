@@ -196,15 +196,8 @@ const ManageReports = () => {
     return status === 'done' ? 'Solved' : status === 'in-progress' ? 'Being Solved' : 'New';
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="w-10 h-10 rounded-full border-3 border-purple-500 border-t-transparent animate-spin"></div>
-      </div>
-    );
-  }
-
   // Используем useMemo для автоматического пересчета счетчиков при изменении reports
+  // ВАЖНО: хуки должны быть до условного возврата!
   const pendingCount = useMemo(() => 
     reports.filter(r => !r.isApproved).length, 
     [reports]
@@ -218,6 +211,14 @@ const ManageReports = () => {
     [reports]
   );
   const totalCount = reports.length;
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="w-10 h-10 rounded-full border-3 border-purple-500 border-t-transparent animate-spin"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 space-y-6">
