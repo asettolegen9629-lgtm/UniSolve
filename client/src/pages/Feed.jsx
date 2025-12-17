@@ -109,7 +109,7 @@ const Feed = () => {
       setfeeds([])
       setPendingFeeds([])
     } finally {
-      setLoading(false)
+    setLoading(false)
     }
   }
   
