@@ -8,48 +8,70 @@ if ! command -v node &> /dev/null; then
     exit 1
 fi
 
-# Проверка PostgreSQL
-if ! command -v psql &> /dev/null; then
-    echo "⚠️  PostgreSQL не найден. Установите PostgreSQL:"
-    echo "   macOS: brew install postgresql@14 && brew services start postgresql@14"
-    echo "   Linux: sudo apt install postgresql"
-    echo "   Windows: https://www.postgresql.org/download/windows/"
+# Проверка npm
+if ! command -v npm &> /dev/null; then
+    echo "❌ npm не установлен! Установите Node.js с https://nodejs.org/"
     exit 1
 fi
 
-# Установка зависимостей для frontend
-if [ ! -d "client/node_modules" ]; then
-    echo "📦 Установка зависимостей для frontend..."
-    cd client
-    npm install
-    cd ..
+# Проверка PostgreSQL (не критично, можно использовать облачную БД)
+if ! command -v psql &> /dev/null; then
+    echo "⚠️  PostgreSQL не найден локально. Можно использовать облачную БД (Supabase)."
+    echo "   Или установите PostgreSQL:"
+    echo "   macOS: brew install postgresql@14 && brew services start postgresql@14"
+    echo "   Linux: sudo apt install postgresql"
 fi
 
-# Создание .env для frontend
-if [ ! -f "client/.env" ]; then
+# Установка зависимостей для frontend (ВСЕГДА)
+echo "📦 Установка зависимостей для frontend..."
+cd client
+if [ ! -d "node_modules" ] || [ ! -f "package-lock.json" ]; then
+    echo "   Установка npm пакетов..."
+    npm install
+else
+    echo "   Проверка зависимостей..."
+    npm install
+fi
+
+# Создание .env для frontend (ВСЕГДА проверяем)
+if [ ! -f ".env" ]; then
     echo "📝 Создание .env для frontend..."
-    cat > client/.env << EOF
+    cat > .env << EOF
 VITE_CLERK_PUBLISHABLE_KEY=pk_test_ZWxlZ2FudC1uZXd0LTQ3LmNsZXJrLmFjY291bnRzLmRldiQ
 VITE_API_URL=http://localhost:3000/api
 EOF
+    echo "✅ .env файл создан для frontend"
+else
+    # Проверяем что ключ есть
+    if ! grep -q "VITE_CLERK_PUBLISHABLE_KEY" .env; then
+        echo "📝 Добавление недостающих переменных в .env..."
+        echo "VITE_CLERK_PUBLISHABLE_KEY=pk_test_ZWxlZ2FudC1uZXd0LTQ3LmNsZXJrLmFjY291bnRzLmRldiQ" >> .env
+        echo "VITE_API_URL=http://localhost:3000/api" >> .env
+    fi
 fi
+cd ..
 
-# Установка зависимостей для backend
-if [ ! -d "unislove-backend/node_modules" ]; then
-    echo "📦 Установка зависимостей для backend..."
-    cd unislove-backend
+# Установка зависимостей для backend (ВСЕГДА)
+echo "📦 Установка зависимостей для backend..."
+cd unislove-backend
+if [ ! -d "node_modules" ] || [ ! -f "package-lock.json" ]; then
+    echo "   Установка npm пакетов..."
     npm install
-    cd ..
+else
+    echo "   Проверка зависимостей..."
+    npm install
 fi
 
-# Создание .env для backend
-if [ ! -f "unislove-backend/.env" ]; then
+# Создание .env для backend (ВСЕГДА проверяем)
+if [ ! -f ".env" ]; then
     echo "📝 Создание .env для backend..."
-    cat > unislove-backend/.env << EOF
+    cat > .env << EOF
 DATABASE_URL="postgresql://postgres:postgres@localhost:5432/unislove_db?schema=public"
 PORT=3000
 EOF
+    echo "✅ .env файл создан для backend"
 fi
+cd ..
 
 # Проверка и создание базы данных
 echo "🗄️  Проверка базы данных..."

@@ -16,35 +16,52 @@ if %ERRORLEVEL% NEQ 0 (
     exit /b 1
 )
 
-if not exist "client\node_modules" (
-    echo 📦 Установка зависимостей для frontend...
-    cd client
+echo 📦 Установка зависимостей для frontend...
+cd client
+if not exist "node_modules" (
+    echo    Установка npm пакетов...
     call npm install
-    cd ..
+) else (
+    echo    Проверка зависимостей...
+    call npm install
 )
 
-if not exist "client\.env" (
+if not exist ".env" (
     echo 📝 Создание .env для frontend...
     (
         echo VITE_CLERK_PUBLISHABLE_KEY=pk_test_ZWxlZ2FudC1uZXd0LTQ3LmNsZXJrLmFjY291bnRzLmRldiQ
         echo VITE_API_URL=http://localhost:3000/api
-    ) > client\.env
+    ) > .env
+    echo ✅ .env файл создан для frontend
+) else (
+    findstr /C:"VITE_CLERK_PUBLISHABLE_KEY" .env >nul
+    if errorlevel 1 (
+        echo 📝 Добавление недостающих переменных в .env...
+        echo VITE_CLERK_PUBLISHABLE_KEY=pk_test_ZWxlZ2FudC1uZXd0LTQ3LmNsZXJrLmFjY291bnRzLmRldiQ >> .env
+        echo VITE_API_URL=http://localhost:3000/api >> .env
+    )
 )
+cd ..
 
-if not exist "unislove-backend\node_modules" (
-    echo 📦 Установка зависимостей для backend...
-    cd unislove-backend
+echo 📦 Установка зависимостей для backend...
+cd unislove-backend
+if not exist "node_modules" (
+    echo    Установка npm пакетов...
     call npm install
-    cd ..
+) else (
+    echo    Проверка зависимостей...
+    call npm install
 )
 
-if not exist "unislove-backend\.env" (
+if not exist ".env" (
     echo 📝 Создание .env для backend...
     (
         echo DATABASE_URL="postgresql://postgres:postgres@localhost:5432/unislove_db?schema=public"
         echo PORT=3000
-    ) > unislove-backend\.env
+    ) > .env
+    echo ✅ .env файл создан для backend
 )
+cd ..
 
 echo 🗄️  Проверка базы данных...
 cd unislove-backend
