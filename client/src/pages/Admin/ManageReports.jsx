@@ -112,8 +112,11 @@ const ManageReports = () => {
     try {
       await reportsAPI.approve(reportId, approve);
       toast.success(approve ? 'Report approved and published! User will be notified.' : 'Report rejected! User will be notified.');
-      fetchReports();
       setShowModal(false);
+      // Обновляем данные с небольшой задержкой для синхронизации с сервером
+      setTimeout(() => {
+        fetchReports();
+      }, 500);
     } catch (error) {
       console.error('Error approving report:', error);
       toast.error(error.response?.data?.error || 'Failed to update report');
@@ -125,8 +128,11 @@ const ManageReports = () => {
       await reportsAPI.updateStatus(reportId, newStatus);
       const statusLabel = newStatus === 'done' ? 'Solved' : newStatus === 'in-progress' ? 'In Progress' : newStatus;
       toast.success(`Report status changed to "${statusLabel}"! User will be notified.`);
-      fetchReports();
       setShowModal(false);
+      // Обновляем данные с небольшой задержкой для синхронизации с сервером
+      setTimeout(() => {
+        fetchReports();
+      }, 500);
     } catch (error) {
       console.error('Error updating status:', error);
       toast.error('Failed to update status');
@@ -149,8 +155,11 @@ const ManageReports = () => {
     try {
       await reportsAPI.verify(reportId, isVerified);
       toast.success(isVerified ? 'Report verified!' : 'Report unverified!');
-      fetchReports();
       setShowModal(false);
+      // Обновляем данные с небольшой задержкой для синхронизации с сервером
+      setTimeout(() => {
+        fetchReports();
+      }, 500);
     } catch (error) {
       console.error('Error verifying report:', error);
       toast.error('Failed to verify report');
@@ -164,8 +173,11 @@ const ManageReports = () => {
     try {
       await reportsAPI.delete(reportId);
       toast.success('Report deleted!');
-      fetchReports();
       setShowModal(false);
+      // Обновляем данные с небольшой задержкой для синхронизации с сервером
+      setTimeout(() => {
+        fetchReports();
+      }, 500);
     } catch (error) {
       console.error('Error deleting report:', error);
       toast.error('Failed to delete report');
@@ -192,9 +204,19 @@ const ManageReports = () => {
     );
   }
 
-  const pendingCount = reports.filter(r => !r.isApproved).length;
-  const inProgressCount = reports.filter(r => r.isApproved && r.status === 'in-progress').length;
-  const solvedCount = reports.filter(r => r.status === 'done').length;
+  // Используем useMemo для автоматического пересчета счетчиков при изменении reports
+  const pendingCount = useMemo(() => 
+    reports.filter(r => !r.isApproved).length, 
+    [reports]
+  );
+  const inProgressCount = useMemo(() => 
+    reports.filter(r => r.isApproved && r.status === 'in-progress').length, 
+    [reports]
+  );
+  const solvedCount = useMemo(() => 
+    reports.filter(r => r.status === 'done').length, 
+    [reports]
+  );
   const totalCount = reports.length;
 
   return (
