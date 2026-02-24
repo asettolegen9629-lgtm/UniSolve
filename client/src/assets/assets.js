@@ -152,14 +152,7 @@ export const dummyPostsData = [
 
     },
     // {
-    //     "_id": "686e6b21de877d29cf02e2a7",
-    //     "user": dummyUserData,
-    //     "content": "This is a sample paragraph with some #hashtags like #socialmedia and #marketing. Let's find them!",
-    //     "image_urls": [],
-    //     "post_type": "text",
-    //     "likes_count": [],
-    //     "createdAt": "2025-07-09T13:14:09.144Z",
-    //     "updatedAt": "2025-07-09T13:14:09.144Z",
+    
     // },
     {
         "_id": "686e3e47ba0cf0fecba19947",

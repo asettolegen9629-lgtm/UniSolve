@@ -137,3 +137,4 @@ module.exports = {
   getFeedbackStatistics,
   getFeedbacksByReport,
   markFeedbackAsRead,
+}
