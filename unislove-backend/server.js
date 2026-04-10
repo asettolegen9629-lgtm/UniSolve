@@ -29,6 +29,7 @@ app.use((req, res, next) => {
 app.use('/uploads', express.static('uploads'));
 
 const uploadsDir = path.join(__dirname, 'uploads');
+// Small safety step: create uploads folder automatically on first run.
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }

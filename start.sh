@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# Simple all-in-one script: installs deps and starts both services.
 echo "🚀 Запуск UniSolve..."
 
 # Проверка Node.js

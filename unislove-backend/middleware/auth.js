@@ -27,6 +27,7 @@ const isAdmin = async (req, res, next) => {
   try {
     const prisma = require('../prismaClient');
     
+    // Quick debug logs help us understand why admin access fails in dev.
     console.log('isAdmin check - clerkId:', req.user?.clerkId);
     
     const user = await prisma.user.findUnique({

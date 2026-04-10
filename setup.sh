@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# Initial setup helper for a fresh local machine.
 echo "🚀 Настройка проекта UniSolve..."
 
 # Установка зависимостей для frontend
