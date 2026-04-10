@@ -1,8 +1,11 @@
 {
   "name": "unislove-backend",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "UniSolve backend API",
+  "main": "server.js",
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "DATABASE_URL=\"postgresql://postgres:postgres@localhost:5432/unislove_db?schema=public\" PORT=3000 node server.js",

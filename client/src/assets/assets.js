@@ -6,7 +6,7 @@ import group_users from './group_users.png'
 import { Home, MessageCircle, Search, UserIcon, Users,Bell,Star } from 'lucide-react'
 import sponsored_img from './sponsored_img.png'
 import logo2 from './logo2.svg'
-
+//make a function 
 export const assets = {
     logo,
     logo2,

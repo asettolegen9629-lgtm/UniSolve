@@ -7,7 +7,7 @@ echo "🚀 Настройка проекта UniSolve..."
 echo "📦 Установка зависимостей для frontend..."
 cd client
 npm install
-
+#generate a setup.bat file
 # Создание .env для frontend если его нет
 if [ ! -f .env ]; then
     echo "📝 Создание .env для frontend..."

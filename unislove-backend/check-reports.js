@@ -1,6 +1,6 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
-
+//make a function 
 async function checkReports() {
   try {
     console.log('\n🔍 Checking reports in database...\n');
