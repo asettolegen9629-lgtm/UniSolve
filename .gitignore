@@ -2,7 +2,7 @@
 node_modules/
 package-lock.json
 
-# Environment variables
+# Environment variables files
 .env
 .env.local
 .env.*.local

@@ -124,3 +124,5 @@ module.exports = {
   markAdminNotificationAsRead,
   getAdminUnreadCount,
 };
+
+//make a function 

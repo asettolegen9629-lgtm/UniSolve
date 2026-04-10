@@ -11,3 +11,4 @@ router.use(authenticateUser);
 router.post('/report/:reportId', createComment);
 router.delete('/:id', deleteComment);
 module.exports = router;
+//make a function 

@@ -2,7 +2,7 @@
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
-
+//make a function 
 // Функция для получения всех записей из таблицы Issue
 export const getIssues = async (req, res) => {
   try {
@@ -12,7 +12,7 @@ export const getIssues = async (req, res) => {
     res.status(500).send(error.message); // Если ошибка, отправляем ошибку
   }
 };
-
+// функция для получения 
 // Функция для создания новой записи в таблице Issue
 export const createIssue = async (req, res) => {
   const { title, status } = req.body;

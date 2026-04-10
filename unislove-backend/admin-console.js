@@ -7,7 +7,7 @@
 
 // Load environment variables
 require('dotenv').config();
-
+//
 // Check if DATABASE_URL is set
 if (!process.env.DATABASE_URL) {
   console.error('\x1b[31m%s\x1b[0m', '❌ Error: DATABASE_URL not found!');

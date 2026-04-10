@@ -14,7 +14,7 @@ if ! command -v npm &> /dev/null; then
     echo "❌ npm не установлен! Установите Node.js с https://nodejs.org/"
     exit 1
 fi
-
+#bb
 # Проверка PostgreSQL (не критично, можно использовать облачную БД)
 if ! command -v psql &> /dev/null; then
     echo "⚠️  PostgreSQL не найден локально. Можно использовать облачную БД (Supabase)."

@@ -21,3 +21,4 @@ router.get('/admin/all', isAdmin, getAdminNotifications);
 router.get('/admin/unread-count', isAdmin, getAdminUnreadCount);
 router.put('/admin/:id/read', isAdmin, markAdminNotificationAsRead);
 module.exports = router;
+//
