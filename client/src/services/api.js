@@ -8,6 +8,7 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  // Keeping requests from hanging forever when backend is down.
   timeout: 10000, // 10 second timeout
 });
 
