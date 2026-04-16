@@ -5,45 +5,84 @@
 
 ---
 
-## Score: 5 / 10
+## Score Before Cleanup: 5 / 10 → After Cleanup: 8.5 / 10
 
 ---
 
 ## Criteria Breakdown
 
-### 1. README Quality — 0 / 2
-No `README.md` exists at all. A visitor cloning the repository has no idea what the project is, how to install it, or how to run it. This is the most critical gap.
+### 1. README Quality — 2 / 2 ✅
+`README.md` now exists and covers: project title, one-line description, problem statement, features, tech stack, project structure, installation steps for both frontend and backend, environment variables reference, and license. A new visitor can clone and run the project from scratch.
 
-### 2. Folder Structure — 1.5 / 2
-The main structure is reasonable: `client/` holds the React frontend and `unislove-backend/` holds the Node.js/Express backend. However, several files are misplaced:
-- `controllers/issuesController.js` sits at the repo root instead of inside `unislove-backend/controllers/`
-- `prisma.config.ts` sits at the repo root instead of inside `unislove-backend/`
-- `dependecies.py` is an unrelated FastAPI hello-world stub that does not belong in a Node.js/React project
-- No `docs/`, `tests/`, or `assets/` directories exist
-
-### 3. File Naming Consistency — 1 / 2
-- `dependecies.py` has a typo (missing an 'n')
-- `unislove-backend/` has a typo in the folder name (`unislove` vs `unisolve`)
-- Otherwise, naming is consistent (camelCase for JS files, kebab-case for directories)
-
-### 4. Essential Files — 1.5 / 2
-- `.gitignore` — present and well-configured
-- `package.json` — present at root and in sub-projects
-- `LICENSE` — **missing**
-- `README.md` — **missing**
-
-### 5. Commit History Quality — 1 / 2
-The commit history exists with mostly descriptive messages. Some commits are vague (`"be71a93 replace old files with updated versions"`). Conventional commits format is partially followed but not consistently.
+> **Before:** 0 / 2 — No `README.md` existed at all.
 
 ---
 
-## Action Plan
+### 2. Folder Structure — 2 / 2 ✅
+The repo now follows a clean, logical layout:
 
-| Issue | Action |
+```
+UniSolve/
+├── client/                  # React frontend
+├── unislove-backend/        # Express backend (all controllers, routes, prisma inside)
+├── docs/
+├── tests/
+├── assets/
+├── README.md
+├── AUDIT.md
+├── LICENSE
+└── .gitignore
+```
+
+All previously misplaced files have been resolved:
+- `controllers/issuesController.js` moved → `unislove-backend/controllers/`
+- `prisma.config.ts` moved → `unislove-backend/`
+- `dependecies.py` (unrelated FastAPI stub) removed
+
+> **Before:** 1.5 / 2 — Several files were misplaced at the repo root.
+
+---
+
+### 3. File Naming Consistency — 1.5 / 2
+- `dependecies.py` (typo) has been removed
+- `unislove-backend/` still has a typo in the folder name (`unislove` vs `unisolve`) — not fixed to avoid breaking existing scripts and imports
+- All JS files use consistent camelCase, directories use kebab-case
+
+> **Before:** 1 / 2
+
+---
+
+### 4. Essential Files — 2 / 2 ✅
+- `.gitignore` — present and well-configured
+- `package.json` — present at root and in sub-projects
+- `LICENSE` — added (MIT)
+- `README.md` — added
+
+> **Before:** 1.5 / 2 — LICENSE and README were missing.
+
+---
+
+### 5. Commit History Quality — 1 / 2
+The commit history has mostly descriptive messages but some are vague (`"replace old files with updated versions"`). Conventional commits format is partially followed but not consistent throughout the history. New commits follow the convention.
+
+> **Unchanged:** 1 / 2
+
+---
+
+## Changes Made
+
+| Issue | Status |
 |---|---|
-| No README | Create comprehensive README.md |
-| No LICENSE | Add MIT LICENSE |
-| Misplaced `controllers/` | Move into `unislove-backend/controllers/` |
-| Misplaced `prisma.config.ts` | Move into `unislove-backend/` |
-| Irrelevant `dependecies.py` | Remove |
-| Missing directories | Add `docs/`, `tests/`, `assets/` |
+| No README | ✅ Created comprehensive README.md |
+| No LICENSE | ✅ Added MIT LICENSE |
+| Misplaced `controllers/` at root | ✅ Moved into `unislove-backend/controllers/` |
+| Misplaced `prisma.config.ts` at root | ✅ Moved into `unislove-backend/` |
+| Irrelevant `dependecies.py` | ✅ Removed |
+| Missing `docs/`, `tests/`, `assets/` | ✅ Added |
+
+## Remaining Issues
+
+| Issue | Reason not fixed |
+|---|---|
+| `unislove-backend/` folder name typo | Renaming would break `start.sh`, `setup.sh`, and all internal imports |
+| Vague older commit messages | Git history rewrite avoided to keep history clean |
