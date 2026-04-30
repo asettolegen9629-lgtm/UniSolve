@@ -8,8 +8,9 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "DATABASE_URL=\"postgresql://postgres:postgres@localhost:5432/unislove_db?schema=public\" PORT=3000 node server.js",
-    "admin": "DATABASE_URL=\"postgresql://postgres:postgres@localhost:5432/unislove_db?schema=public\" PORT=3000 node admin-console.js"
+    "start": "node server.js",
+    "admin": "node admin-console.js",
+    "grant-admin": "node grant-admin.js"
   },
   "keywords": [],
   "author": "",

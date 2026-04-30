@@ -5,22 +5,8 @@
  * Terminal-based admin interface for managing reports, users, and system
  */
 
-// Load environment variables
-require('dotenv').config();
-//
-// Check if DATABASE_URL is set
-if (!process.env.DATABASE_URL) {
-  console.error('\x1b[31m%s\x1b[0m', '❌ Error: DATABASE_URL not found!');
-  console.log('\nPlease create a .env file in the unislove-backend directory with:');
-  console.log('DATABASE_URL="postgresql://username:password@localhost:5432/unislove_db?schema=public"');
-  console.log('PORT=3000\n');
-  console.log('See SETUP_ENV.md for more details.\n');
-  process.exit(1);
-}
-
 const readline = require('readline');
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+const prisma = require('./prismaClient');
 
 const rl = readline.createInterface({
   input: process.stdin,

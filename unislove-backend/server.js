@@ -1,3 +1,16 @@
+require('./loadEnv');
+try {
+  const dbUrl = process.env.DATABASE_URL;
+  if (dbUrl) {
+    const u = new URL(dbUrl.replace(/^postgresql:/, 'http:'));
+    console.log(`[config] DB host (from .env file): ${u.hostname}`);
+  }
+} catch {
+  /* ignore malformed DATABASE_URL in logs */
+}
+
+const prisma = require('./prismaClient');
+
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
@@ -50,6 +63,22 @@ app.use('/api/feedback', feedbackRoutes);
 
 app.get('/health', (req, res) => {
   res.json({ status: 'OK', message: 'Server is running' });
+});
+
+app.get('/health/db', async (req, res) => {
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    let dbHost = 'unknown';
+    try {
+      const dbUrl = process.env.DATABASE_URL || '';
+      dbHost = new URL(dbUrl.replace(/^postgresql:/, 'http:')).hostname;
+    } catch (_) {
+      /* ignore */
+    }
+    res.json({ ok: true, dbHost });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: String(e.message || e) });
+  }
 });
 
 app.use((err, req, res, next) => {
