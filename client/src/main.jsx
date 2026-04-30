@@ -5,6 +5,7 @@ import App from './App.jsx'
 import {BrowserRouter} from 'react-router-dom'
 import { ClerkProvider, useUser } from '@clerk/clerk-react'
 import { setClerkHeaders } from './services/api'
+import AppErrorBoundary from './components/AppErrorBoundary'
 
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
 
@@ -26,11 +27,13 @@ const AppWithAuth = () => {
 }
 
 createRoot(document.getElementById('root')).render(
-   <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
-    <BrowserRouter>
-          <AppWithAuth />
-    </BrowserRouter>
- </ClerkProvider>
+  <AppErrorBoundary>
+    <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
+      <BrowserRouter>
+        <AppWithAuth />
+      </BrowserRouter>
+    </ClerkProvider>
+  </AppErrorBoundary>
   
     
 )
