@@ -81,34 +81,47 @@ const updateUser = async (req, res) => {
   }
 };
 const getCurrentUser = async (req, res) => {
-  try {
-    const { clerkId } = req.user;
-    const user = await prisma.user.findUnique({
-      where: { clerkId },
+  const userSelect = {
+    id: true,
+    clerkId: true,
+    email: true,
+    username: true,
+    fullName: true,
+    profilePicture: true,
+    isAdmin: true,
+    createdAt: true,
+    updatedAt: true,
+    reports: {
+      orderBy: { createdAt: 'desc' },
       select: {
         id: true,
-        clerkId: true,
-        email: true,
-        username: true,
-        fullName: true,
-        profilePicture: true,
-        isAdmin: true,
-        createdAt: true,
-        updatedAt: true,
-        reports: {
-          orderBy: { createdAt: 'desc' },
-          select: {
-            id: true,
-            description: true,
-            category: true,
-            status: true,
-            createdAt: true
-          }
-        }
+        description: true,
+        category: true,
+        status: true,
+        createdAt: true
       }
+    }
+  };
+  try {
+    const { clerkId, email, username, fullName } = req.user;
+    let user = await prisma.user.findUnique({
+      where: { clerkId },
+      select: userSelect
     });
     if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+      if (!email) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+      user = await prisma.user.create({
+        data: {
+          clerkId,
+          email,
+          username: username || email.split('@')[0],
+          fullName: fullName || username || email.split('@')[0],
+          profilePicture: null
+        },
+        select: userSelect
+      });
     }
     console.log('getCurrentUser - Returning user with isAdmin:', user.isAdmin);
     res.json(user);

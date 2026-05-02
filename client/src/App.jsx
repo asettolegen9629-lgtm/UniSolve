@@ -8,8 +8,9 @@ import Profile from './pages/Profile'
 import Report from './pages/Report'
 import { useUser } from '@clerk/clerk-react'
 import Layout from './pages/Layout'
-import { setClerkHeaders, usersAPI } from './services/api'
+import { setClerkHeaders, usersAPI, API_URL } from './services/api'
 import { Loading } from './components/Loading'
+import { MissingApiConfig } from './components/MissingApiConfig'
 // Admin pages
 import AdminLayout from './pages/Admin/AdminLayout'
 import AdminDashboard from './pages/Admin/Dashboard'
@@ -31,29 +32,44 @@ const App = () => {
     if (!user) {
       setIsAdmin(false)
       setResolvedUserId(null)
-      return () => {
-        active = false
-      }
+      return
     }
 
     setClerkHeaders(user)
 
-    usersAPI
-      .getCurrent()
-      .then((current) => {
+    const bootstrap = async () => {
+      try {
+        const email =
+          user.primaryEmailAddress?.emailAddress || user.emailAddresses?.[0]?.emailAddress
+        if (!email) {
+          console.error('Clerk user has no email; cannot sync with backend')
+          if (active) setIsAdmin(false)
+          return
+        }
+        await usersAPI.sync({
+          clerkId: user.id,
+          email,
+          username: user.username || email.split('@')[0],
+          fullName:
+            `${user.firstName || ''} ${user.lastName || ''}`.trim() ||
+            user.fullName ||
+            user.username ||
+            'User',
+          profilePicture: user.imageUrl
+        })
+        if (!active) return
+        const current = await usersAPI.getCurrent()
         if (!active) return
         setIsAdmin(current?.isAdmin === true)
-      })
-      .catch((err) => {
-        console.error('Role detection failed:', err)
-        if (!active) return
-        setIsAdmin(false)
-      })
-      .finally(() => {
-        if (!active) return
-        setResolvedUserId(user.id)
-      })
+      } catch (err) {
+        console.error('Auth bootstrap failed:', err)
+        if (active) setIsAdmin(false)
+      } finally {
+        if (active) setResolvedUserId(user.id)
+      }
+    }
 
+    bootstrap()
     return () => {
       active = false
     }
@@ -61,6 +77,10 @@ const App = () => {
 
   if (!isLoaded) {
     return <Loading />
+  }
+
+  if (import.meta.env.PROD && !API_URL) {
+    return <MissingApiConfig />
   }
 
   if (user && resolvedUserId !== user.id) {
