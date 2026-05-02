@@ -1,4 +1,5 @@
 const prisma = require('../prismaClient');
+const { ensureUserRecord } = require('../utils/ensureUser');
 const createFeedback = async (req, res) => {
   try {
     const clerkId = req.user?.clerkId || req.headers['x-clerk-user-id'];
@@ -13,7 +14,7 @@ const createFeedback = async (req, res) => {
     if (!validTypes.includes(type)) {
       return res.status(400).json({ error: 'Invalid feedback type' });
     }
-    const user = await prisma.user.findUnique({ where: { clerkId } });
+    const user = await ensureUserRecord(req);
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
@@ -101,7 +102,7 @@ const getFeedbacksByReport = async (req, res) => {
     if (!clerkId) {
       return res.status(401).json({ error: 'User not authenticated' });
     }
-    const user = await prisma.user.findUnique({ where: { clerkId } });
+    const user = await ensureUserRecord(req);
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }

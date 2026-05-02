@@ -1,12 +1,10 @@
 const prisma = require('../prismaClient');
+const { ensureUserRecord } = require('../utils/ensureUser');
 const createComment = async (req, res) => {
   try {
-    const { clerkId } = req.user;
     const { reportId } = req.params;
     const { content, parentCommentId } = req.body;
-    const user = await prisma.user.findUnique({
-      where: { clerkId }
-    });
+    const user = await ensureUserRecord(req);
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
@@ -172,11 +170,8 @@ const getCommentsByReport = async (req, res) => {
 };
 const deleteComment = async (req, res) => {
   try {
-    const { clerkId } = req.user;
     const { id } = req.params;
-    const user = await prisma.user.findUnique({
-      where: { clerkId }
-    });
+    const user = await ensureUserRecord(req);
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }

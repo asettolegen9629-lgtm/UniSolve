@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import Login from './pages/Login'
+import Register from './pages/Register'
 import Feed from './pages/Feed'
 import Notification from './pages/Notification'
 import Feedback from './pages/Feedback'
@@ -90,6 +91,10 @@ const App = () => {
   return (
     <>
       <Routes>
+        <Route
+          path="/sign-up"
+          element={!user ? <Register /> : <Navigate to="/" replace />}
+        />
         <Route path='/' element={!user ? <Login /> : isAdmin ? <Navigate to="/admin" replace /> : <Layout />}>
           <Route index element={<Feed />} />
           <Route path='notifications' element={isAdmin ? <Navigate to="/admin/notifications" replace /> : <Notification />} />

@@ -4,8 +4,6 @@ import { reportsAPI } from '../../services/api';
 import toast from 'react-hot-toast';
 import moment from 'moment';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-
 const Dashboard = () => {
   const [statistics, setStatistics] = useState(null);
   const [reports, setReports] = useState([]);

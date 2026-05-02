@@ -13,6 +13,7 @@ function loadEnv() {
     console.warn('[loadEnv] Missing', envPath);
     return;
   }
+
   const parsed = dotenv.parse(fs.readFileSync(envPath, 'utf8'));
   for (const key of Object.keys(parsed)) {
     process.env[key] = parsed[key];

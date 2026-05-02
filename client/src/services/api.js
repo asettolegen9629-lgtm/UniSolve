@@ -1,6 +1,32 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+const DEV_FALLBACK_API_URL = 'http://localhost:3000/api';
+
+/**
+ * Render: `unislove.onrender.com` is often a typo or unused hostname (no Web Service → no CORS).
+ * The live UniSolve API runs on `unisolve.onrender.com`. Normalizes the common mistake at runtime
+ * so production works even if Vercel still has the wrong VITE_API_URL.
+ */
+function normalizeProductionApiUrl(url) {
+  if (!url || typeof url !== 'string') return url;
+  return url.replace(/unislove\.onrender\.com/gi, 'unisolve.onrender.com');
+}
+
+const rawApiUrl = normalizeProductionApiUrl(import.meta.env.VITE_API_URL);
+export const API_URL = rawApiUrl || (import.meta.env.DEV ? DEV_FALLBACK_API_URL : '');
+export const API_ORIGIN = API_URL.replace(/\/api\/?$/, '');
+export const toAbsoluteApiUrl = (url) => {
+  if (!url) return '';
+  if (url.startsWith('http')) {
+    const legacyLocal = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?\//i;
+    if (legacyLocal.test(url)) {
+      const pathOnly = url.replace(/^https?:\/\/[^/]+/, '');
+      return `${API_ORIGIN}${pathOnly}`;
+    }
+    return url;
+  }
+  return `${API_ORIGIN}${url}`;
+};
 
 // Create axios instance with default config
 const api = axios.create({
@@ -29,6 +55,12 @@ export const setClerkHeaders = (user) => {
 // Add request interceptor to include Clerk auth headers and handle errors
 api.interceptors.request.use(
   async (config) => {
+    if (!API_URL) {
+      return Promise.reject(
+        new Error('Missing VITE_API_URL in production environment')
+      );
+    }
+
     // Set Clerk headers if user is available
     if (currentClerkUser) {
       config.headers['x-clerk-user-id'] = currentClerkUser.id;

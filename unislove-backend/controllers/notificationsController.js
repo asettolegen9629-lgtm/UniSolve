@@ -1,10 +1,8 @@
 const prisma = require('../prismaClient');
+const { ensureUserRecord } = require('../utils/ensureUser');
 const getNotifications = async (req, res) => {
   try {
-    const { clerkId } = req.user;
-    const user = await prisma.user.findUnique({
-      where: { clerkId }
-    });
+    const user = await ensureUserRecord(req);
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
@@ -49,11 +47,8 @@ take: 50,
 };
 const markAsRead = async (req, res) => {
   try {
-    const { clerkId } = req.user;
     const { id } = req.params;
-    const user = await prisma.user.findUnique({
-      where: { clerkId }
-    });
+    const user = await ensureUserRecord(req);
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
@@ -78,10 +73,7 @@ const markAsRead = async (req, res) => {
 };
 const markAllAsRead = async (req, res) => {
   try {
-    const { clerkId } = req.user;
-    const user = await prisma.user.findUnique({
-      where: { clerkId }
-    });
+    const user = await ensureUserRecord(req);
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
@@ -103,10 +95,7 @@ const markAllAsRead = async (req, res) => {
 };
 const getUnreadCount = async (req, res) => {
   try {
-    const { clerkId } = req.user;
-    const user = await prisma.user.findUnique({
-      where: { clerkId }
-    });
+    const user = await ensureUserRecord(req);
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }

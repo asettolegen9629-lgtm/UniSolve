@@ -1,4 +1,5 @@
 const prisma = require('../prismaClient');
+const { ensureUserRecord } = require('../utils/ensureUser');
 const createReport = async (req, res) => {
   try {
     const clerkId = req.user?.clerkId || req.headers['x-clerk-user-id'] || 'guest_default';
@@ -209,10 +210,7 @@ const getReportById = async (req, res) => {
 };
 const getReportsByUser = async (req, res) => {
   try {
-    const { clerkId } = req.user;
-    const user = await prisma.user.findUnique({
-      where: { clerkId }
-    });
+    const user = await ensureUserRecord(req);
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
@@ -351,13 +349,10 @@ const rateReportByUser = async (req, res) => {
   try {
     const { id } = req.params;
 const { rating } = req.body;
-    const { clerkId } = req.user;
     if (!rating || rating < 1 || rating > 5) {
       return res.status(400).json({ error: 'Rating must be between 1 and 5' });
     }
-    const user = await prisma.user.findUnique({
-      where: { clerkId }
-    });
+    const user = await ensureUserRecord(req);
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }

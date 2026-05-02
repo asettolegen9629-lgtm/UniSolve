@@ -14,7 +14,7 @@ import { Camera, Mail, Lock, Moon, Sun, Heart, MessageCircle, Edit2, Save, X } f
 import moment from 'moment';
 import toast from 'react-hot-toast';
 import PostCard from '../components/PostCard'
-import { usersAPI, reportsAPI } from '../services/api'
+import { usersAPI, reportsAPI, toAbsoluteApiUrl } from '../services/api'
 import { likesAPI } from '../services/api'
 
 const Profile = () => {
@@ -87,7 +87,7 @@ const Profile = () => {
         content: report.description || '',
         image_urls: (report.images || []).map(img => {
           const url = img.url || img;
-          return url.startsWith('http') ? url : `http://localhost:3000${url}`;
+          return toAbsoluteApiUrl(url);
         }),
         likes_count: (report.likes || []).map(like => like.user?.id || like.userId || like.id),
         createdAt: report.createdAt,

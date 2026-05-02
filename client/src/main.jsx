@@ -28,7 +28,11 @@ const AppWithAuth = () => {
 
 createRoot(document.getElementById('root')).render(
   <AppErrorBoundary>
-    <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
+    <ClerkProvider
+      publishableKey={PUBLISHABLE_KEY}
+      signInUrl="/"
+      signUpUrl="/sign-up"
+    >
       <BrowserRouter>
         <AppWithAuth />
       </BrowserRouter>

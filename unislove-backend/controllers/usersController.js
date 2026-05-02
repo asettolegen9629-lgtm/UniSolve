@@ -1,4 +1,5 @@
 const prisma = require('../prismaClient');
+const { ensureUserRecord } = require('../utils/ensureUser');
 const getOrCreateUser = async (req, res) => {
   try {
     const { clerkId, email, username, fullName, profilePicture } = req.body;
@@ -38,6 +39,9 @@ const getOrCreateUser = async (req, res) => {
 const getUserById = async (req, res) => {
   try {
     const { id } = req.params;
+    if (id === 'me') {
+      return res.status(400).json({ error: 'Use GET /api/users/me for the current user' });
+    }
     const user = await prisma.user.findUnique({
       where: { id },
       include: {
@@ -59,9 +63,7 @@ const updateUser = async (req, res) => {
   try {
     const { clerkId } = req.user;
     const { email, username, fullName, profilePicture } = req.body;
-    const user = await prisma.user.findUnique({
-      where: { clerkId }
-    });
+    const user = await ensureUserRecord(req);
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
@@ -103,27 +105,15 @@ const getCurrentUser = async (req, res) => {
     }
   };
   try {
-    const { clerkId, email, username, fullName } = req.user;
-    let user = await prisma.user.findUnique({
-      where: { clerkId },
+    const row = await ensureUserRecord(req);
+    if (!row) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    const user = await prisma.user.findUnique({
+      where: { id: row.id },
       select: userSelect
     });
-    if (!user) {
-      if (!email) {
-        return res.status(404).json({ error: 'User not found' });
-      }
-      user = await prisma.user.create({
-        data: {
-          clerkId,
-          email,
-          username: username || email.split('@')[0],
-          fullName: fullName || username || email.split('@')[0],
-          profilePicture: null
-        },
-        select: userSelect
-      });
-    }
-    console.log('getCurrentUser - Returning user with isAdmin:', user.isAdmin);
+    console.log('getCurrentUser - Returning user with isAdmin:', user?.isAdmin);
     res.json(user);
   } catch (error) {
     console.error('Error in getCurrentUser:', error);

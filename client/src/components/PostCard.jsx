@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { BadgeCheck, Heart, MessageCircle, Send, TrendingUp } from 'lucide-react'
 import moment from 'moment'
 import { useUser } from '@clerk/clerk-react'
-import { likesAPI, commentsAPI } from '../services/api'
+import { likesAPI, commentsAPI, toAbsoluteApiUrl } from '../services/api'
 import toast from 'react-hot-toast'
 
 const PostCard = ({post, isPending = false, isPopular = false}) => {
@@ -138,7 +138,7 @@ const PostCard = ({post, isPending = false, isPopular = false}) => {
           <div className='grid grid-cols-2 gap-2'>
             {post.image_urls.map((img,index)=>(
               <img 
-                src={img.startsWith('http') ? img : `http://localhost:3000${img}`} 
+                src={toAbsoluteApiUrl(img)} 
                 key={index} 
                 className={`w-full h-48 object-cover rounded-lg ${post.image_urls.length===1 && 'col-span-2 h-auto'}`}
                 alt="" 

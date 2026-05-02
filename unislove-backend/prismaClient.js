@@ -3,7 +3,7 @@ const { PrismaClient } = require('@prisma/client');
 
 const databaseUrl = process.env.DATABASE_URL;
 if (!databaseUrl || !String(databaseUrl).trim()) {
-  throw new Error('DATABASE_URL is empty after loadEnv — check unislove-backend/.env');
+  throw new Error('DATABASE_URL is empty after loadEnv — set it in unislove-backend/.env, unislove-backend/.env.save, or environment variables');
 }
 if (databaseUrl.includes('niiidqlvjecpaglrsvyl')) {
   throw new Error(

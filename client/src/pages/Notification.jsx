@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { notificationsAPI } from '../services/api';
+import { notificationsAPI, toAbsoluteApiUrl } from '../services/api';
 import moment from 'moment';
 
 const styles = {
@@ -207,7 +207,7 @@ const NotificationItem = ({ notification, onMarkAsRead }) => {
   // Get image URLs
   const imageUrls = report?.images?.map(img => {
     const url = img.url || img;
-    return url.startsWith('http') ? url : `http://localhost:3000${url}`;
+    return toAbsoluteApiUrl(url);
   }) || [];
   
   const handleToggleDetails = (e) => {

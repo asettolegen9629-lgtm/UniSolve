@@ -1,10 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Search, Filter, Edit, Eye, Trash2, Check, X, Star, Shield, CheckCircle2, Plus } from 'lucide-react';
-import { reportsAPI } from '../../services/api';
+import { reportsAPI, toAbsoluteApiUrl } from '../../services/api';
 import toast from 'react-hot-toast';
 import moment from 'moment';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 const ManageReports = () => {
   const [reports, setReports] = useState([]);
@@ -623,7 +621,7 @@ const ActionModal = ({ report, actionType, onClose, onApprove, onStatusChange, o
                   <label className="text-sm font-medium text-gray-700">Images</label>
                   <div className="grid grid-cols-2 gap-2 mt-2">
                     {report.images.map((img, i) => (
-                      <img key={i} src={`${API_URL}${img.url}`} alt="" className="rounded-lg" />
+                      <img key={i} src={toAbsoluteApiUrl(img.url)} alt="" className="rounded-lg" />
                     ))}
                   </div>
                 </div>

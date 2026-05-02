@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { notificationsAPI, feedbackAPI } from '../../services/api';
+import { notificationsAPI, feedbackAPI, toAbsoluteApiUrl } from '../../services/api';
 import toast from 'react-hot-toast';
 import moment from 'moment';
 import { Bell, MessageSquare, FileText, X } from 'lucide-react';
@@ -257,7 +257,7 @@ const AdminNotifications = () => {
                       {selectedNotification.report.images.map((img, i) => (
                         <img
                           key={i}
-                          src={`http://localhost:3000${img.url}`}
+                          src={toAbsoluteApiUrl(img.url)}
                           alt={`Report image ${i + 1}`}
                           className="rounded-lg w-full h-48 object-cover"
                         />

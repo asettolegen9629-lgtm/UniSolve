@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Loading } from '../components/Loading'
 import PostCard from '../components/PostCard'
-import { reportsAPI } from '../services/api'
+import { reportsAPI, API_URL, toAbsoluteApiUrl } from '../services/api'
 import { useUser } from '@clerk/clerk-react'
 
 const Feed = () => {
@@ -13,7 +13,7 @@ const Feed = () => {
 
   const fetchFeeds= async()=>{
     try {
-      console.log('Fetching feeds from:', import.meta.env.VITE_API_URL || 'http://localhost:3000/api')
+      console.log('Fetching feeds from:', API_URL)
       
       // Get approved reports (visible to everyone)
       const approvedData = await reportsAPI.getAll()
@@ -36,7 +36,7 @@ const Feed = () => {
           content: report.description || '',
           image_urls: (report.images || []).map(img => {
             const url = img.url || img;
-            return url.startsWith('http') ? url : `http://localhost:3000${url}`;
+            return toAbsoluteApiUrl(url);
           }),
           likes_count: (report.likes || []).map(like => like.user?.id || like.userId),
           createdAt: report.createdAt,
@@ -72,7 +72,7 @@ const Feed = () => {
         content: report.description || '',
         image_urls: (report.images || []).map(img => {
           const url = img.url || img;
-          return url.startsWith('http') ? url : `http://localhost:3000${url}`;
+          return toAbsoluteApiUrl(url);
         }),
         likes_count: (report.likes || []).map(like => like.user?.id || like.userId),
         createdAt: report.createdAt,
@@ -105,7 +105,7 @@ const Feed = () => {
       console.error('Error fetching feeds:', error)
       console.error('Error details:', error.response?.data || error.message)
       // Show user-friendly error
-      alert('Failed to load feeds. Please check if the backend server is running on http://localhost:3000')
+      alert(`Failed to load feeds. Please check backend: ${API_URL}`)
       setfeeds([])
       setPendingFeeds([])
     } finally {
