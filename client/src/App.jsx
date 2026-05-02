@@ -22,46 +22,48 @@ import AdminNotifications from './pages/Admin/AdminNotifications'
 const App = () => {
   const { user, isLoaded } = useUser()
   const [isAdmin, setIsAdmin] = useState(false)
-  const [roleLoading, setRoleLoading] = useState(false)
+  /** When user is signed in, we must not render routes until /users/me completes for that session (fixes blank/wrong route flash). */
+  const [resolvedUserId, setResolvedUserId] = useState(null)
 
-  // Update headers and detect role when user changes
   useEffect(() => {
     let active = true
 
-    if (user) {
-      setClerkHeaders(user)
-      console.log('Clerk user set:', {
-        id: user.id,
-        email: user.primaryEmailAddress?.emailAddress,
-        username: user.username
-      })
-      setRoleLoading(true)
-      usersAPI
-        .getCurrent()
-        .then((current) => {
-          if (!active) return
-          setIsAdmin(current?.isAdmin === true)
-        })
-        .catch((err) => {
-          console.error('Role detection failed:', err)
-          if (!active) return
-          setIsAdmin(false)
-        })
-        .finally(() => {
-          if (!active) return
-          setRoleLoading(false)
-        })
-    } else {
+    if (!user) {
       setIsAdmin(false)
-      setRoleLoading(false)
+      setResolvedUserId(null)
+      return () => {
+        active = false
+      }
     }
+
+    setClerkHeaders(user)
+
+    usersAPI
+      .getCurrent()
+      .then((current) => {
+        if (!active) return
+        setIsAdmin(current?.isAdmin === true)
+      })
+      .catch((err) => {
+        console.error('Role detection failed:', err)
+        if (!active) return
+        setIsAdmin(false)
+      })
+      .finally(() => {
+        if (!active) return
+        setResolvedUserId(user.id)
+      })
 
     return () => {
       active = false
     }
   }, [user])
 
-  if (!isLoaded || roleLoading) {
+  if (!isLoaded) {
+    return <Loading />
+  }
+
+  if (user && resolvedUserId !== user.id) {
     return <Loading />
   }
 
