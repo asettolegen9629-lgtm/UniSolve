@@ -1,8 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { notificationsAPI, feedbackAPI, toAbsoluteApiUrl } from '../../services/api';
+import { useDocumentVisibleInterval } from '../../hooks/useDocumentVisibleInterval';
 import toast from 'react-hot-toast';
 import moment from 'moment';
 import { Bell, MessageSquare, FileText, X } from 'lucide-react';
+
+const ADMIN_NOTIFICATIONS_POLL_MS = 5000;
 
 const AdminNotifications = () => {
   const [notifications, setNotifications] = useState([]);
@@ -10,25 +13,24 @@ const AdminNotifications = () => {
   const [selectedNotification, setSelectedNotification] = useState(null);
   const [showDetails, setShowDetails] = useState(false);
 
-  useEffect(() => {
-    fetchNotifications();
-    // Auto-refresh every 10 seconds
-    const interval = setInterval(fetchNotifications, 10000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const fetchNotifications = async () => {
+  const fetchNotifications = useCallback(async (opts = {}) => {
+    const silent = opts.silent === true;
     try {
-      // Get admin notifications (new reports and feedbacks)
       const data = await notificationsAPI.getAdminNotifications();
       setNotifications(data);
     } catch (error) {
       console.error('Error fetching admin notifications:', error);
-      toast.error('Failed to load notifications');
+      if (!silent) toast.error('Failed to load notifications');
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchNotifications({ silent: false });
+  }, [fetchNotifications]);
+
+  useDocumentVisibleInterval(() => fetchNotifications({ silent: true }), ADMIN_NOTIFICATIONS_POLL_MS);
 
   const handleMarkAsRead = async (id) => {
     try {

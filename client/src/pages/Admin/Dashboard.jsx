@@ -1,33 +1,39 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { AlertCircle, Clock, CheckCircle, FileText, Edit, Eye, Trash2 } from 'lucide-react';
 import { reportsAPI } from '../../services/api';
+import { useDocumentVisibleInterval } from '../../hooks/useDocumentVisibleInterval';
 import toast from 'react-hot-toast';
 import moment from 'moment';
+
+const ADMIN_DASHBOARD_POLL_MS = 5000;
 
 const Dashboard = () => {
   const [statistics, setStatistics] = useState(null);
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async (opts = {}) => {
+    const silent = opts.silent === true;
     try {
       const [statsData, reportsData] = await Promise.all([
         reportsAPI.getAdminStatistics(),
-        reportsAPI.getAllForAdmin()
+        reportsAPI.getAllForAdmin(),
       ]);
       setStatistics(statsData);
-      setReports(reportsData.slice(0, 4)); // Show first 4 reports in table
+      setReports(reportsData.slice(0, 4));
     } catch (error) {
       console.error('Error fetching data:', error);
-      toast.error('Failed to load data');
+      if (!silent) toast.error('Failed to load data');
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchData({ silent: false });
+  }, [fetchData]);
+
+  useDocumentVisibleInterval(() => fetchData({ silent: true }), ADMIN_DASHBOARD_POLL_MS);
 
   const getStatusColor = (status, isApproved) => {
     if (!isApproved) return 'bg-blue-100 text-blue-700';

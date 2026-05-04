@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, FileText, Bell, Star, User, Users, LogOut, Menu, X } from 'lucide-react';
 import { useUser, useClerk } from '@clerk/clerk-react';
 import { usersAPI, notificationsAPI, setClerkHeaders } from '../../services/api';
-import { useEffect } from 'react';
+import { useDocumentVisibleInterval } from '../../hooks/useDocumentVisibleInterval';
+
+const ADMIN_UNREAD_POLL_MS = 8000;
 
 const AdminLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -40,33 +42,32 @@ const AdminLayout = () => {
     fetchUser();
   }, [clerkUser, navigate]);
 
-  const fetchAdminUnreadCount = async () => {
+  const fetchAdminUnreadCount = useCallback(async () => {
     try {
       const data = await notificationsAPI.getAdminUnreadCount();
       setUnreadCount(data.count || 0);
     } catch (error) {
       console.error('Error fetching admin unread count:', error);
     }
-  };
+  }, []);
 
   useEffect(() => {
     if (isAdmin) {
-      // Fetch count on mount
       fetchAdminUnreadCount();
-      
-      // Refresh count every 30 seconds
-      const interval = setInterval(fetchAdminUnreadCount, 30000);
-      
-      // Listen for notification updates
       const onUpdated = () => fetchAdminUnreadCount();
       window.addEventListener('notifications-updated', onUpdated);
-      
       return () => {
-        clearInterval(interval);
         window.removeEventListener('notifications-updated', onUpdated);
       };
     }
-  }, [isAdmin]);
+  }, [isAdmin, fetchAdminUnreadCount]);
+
+  useDocumentVisibleInterval(
+    () => {
+      if (isAdmin) fetchAdminUnreadCount();
+    },
+    isAdmin ? ADMIN_UNREAD_POLL_MS : null
+  );
 
   if (!isAdmin && user) {
     return (

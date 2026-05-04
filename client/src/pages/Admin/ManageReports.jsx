@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useDocumentVisibleInterval } from '../../hooks/useDocumentVisibleInterval';
 import { Search, Filter, Edit, Eye, Trash2, Check, X, Star, Shield, CheckCircle2, Plus } from 'lucide-react';
 import { reportsAPI, toAbsoluteApiUrl } from '../../services/api';
 import toast from 'react-hot-toast';
@@ -16,54 +17,47 @@ const ManageReports = () => {
   const [showModal, setShowModal] = useState(false);
   const [actionType, setActionType] = useState(null); // 'approve', 'reject', 'status', 'rate', 'delete'
 
-  useEffect(() => {
-    fetchReports();
-    // Auto-refresh every 10 seconds to catch new reports
-    const interval = setInterval(fetchReports, 10000);
-    return () => clearInterval(interval);
+  const ADMIN_REPORTS_POLL_MS = 5000;
+
+  const fetchReports = useCallback(async (opts = {}) => {
+    const silent = opts.silent === true;
+    try {
+      if (!silent) {
+        console.log('Fetching reports for admin...');
+      }
+      const data = await reportsAPI.getAllForAdmin();
+      if (!silent && import.meta.env.DEV) {
+        console.log('Reports received:', data?.length, 'pending:', data?.filter((r) => !r.isApproved).length);
+      }
+
+      if (data && Array.isArray(data)) {
+        setReports(data);
+      } else {
+        console.error('Invalid data format:', data);
+        if (!silent) toast.error('Invalid data received from server');
+        setReports([]);
+      }
+    } catch (error) {
+      console.error('Error fetching reports:', error);
+      const errorMessage = error.response?.data?.error || error.message || 'Unknown error';
+      if (!silent) {
+        toast.error(`Failed to load reports: ${errorMessage}`);
+      }
+      setReports([]);
+    } finally {
+      if (!silent) setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
-    filterReports();
-  }, [reports, searchTerm, statusFilter, categoryFilter]);
+    fetchReports({ silent: false });
+  }, [fetchReports]);
 
-  const fetchReports = async () => {
-    try {
-      console.log('Fetching reports for admin...');
-      const data = await reportsAPI.getAllForAdmin();
-      console.log('✅ Reports received:', data.length);
-      console.log('   Pending:', data.filter(r => !r.isApproved).length);
-      console.log('   Approved:', data.filter(r => r.isApproved).length);
-      
-      if (data && Array.isArray(data)) {
-        setReports(data);
-        setFilteredReports(data);
-      } else {
-        console.error('❌ Invalid data format:', data);
-        toast.error('Invalid data received from server');
-        setReports([]);
-        setFilteredReports([]);
-      }
-    } catch (error) {
-      console.error('❌ Error fetching reports:', error);
-      console.error('   Status:', error.response?.status);
-      console.error('   Data:', error.response?.data);
-      console.error('   Message:', error.message);
-      
-      const errorMessage = error.response?.data?.error || error.message || 'Unknown error';
-      toast.error(`Failed to load reports: ${errorMessage}`);
-      
-      setReports([]);
-      setFilteredReports([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+  useDocumentVisibleInterval(() => fetchReports({ silent: true }), ADMIN_REPORTS_POLL_MS);
 
-  const filterReports = () => {
+  const filterReports = useCallback(() => {
     let filtered = [...reports];
 
-    // Search filter
     if (searchTerm) {
       filtered = filtered.filter(report =>
         report.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -73,7 +67,6 @@ const ManageReports = () => {
       );
     }
 
-    // Status filter
     if (statusFilter !== 'all') {
       if (statusFilter === 'pending') {
         filtered = filtered.filter(r => !r.isApproved);
@@ -82,13 +75,16 @@ const ManageReports = () => {
       }
     }
 
-    // Category filter
     if (categoryFilter !== 'all') {
       filtered = filtered.filter(r => r.category === categoryFilter);
     }
 
     setFilteredReports(filtered);
-  };
+  }, [reports, searchTerm, statusFilter, categoryFilter]);
+
+  useEffect(() => {
+    filterReports();
+  }, [filterReports]);
 
   // Get unique categories from reports
   const getUniqueCategories = () => {
