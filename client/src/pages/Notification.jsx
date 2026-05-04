@@ -184,7 +184,7 @@ const ImageModal = ({ imageUrl, onClose }) => {
   );
 };
 
-// Компонент для отображения каждого уведомления
+// Renders a single notification item
 const NotificationItem = ({ notification, onMarkAsRead }) => {
   const [showDetails, setShowDetails] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
@@ -515,7 +515,7 @@ const NotificationItem = ({ notification, onMarkAsRead }) => {
   );
 };
 
-// Основной компонент уведомлений
+// Main notifications page component
 const Notification = () => {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);

@@ -34,14 +34,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
           if (snapshot.hasError) {
             return SectionCard(
               child: Text(
-                'Ошибка загрузки: ${snapshot.error}',
+                'Failed to load: ${snapshot.error}',
                 style: const TextStyle(color: Colors.red),
               ),
             );
           }
           final reports = snapshot.data ?? const <Report>[];
           if (reports.isEmpty) {
-            return const SectionCard(child: Text('Пока нет репортов'));
+            return const SectionCard(child: Text('No reports yet'));
           }
           return Column(
             children: reports.take(8).map((report) => _ReportCard(report: report)).toList(),

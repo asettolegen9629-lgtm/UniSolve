@@ -20,7 +20,9 @@ async function main() {
   } else if (args[0]) {
     email = args[0];
   } else {
-    email = 'asettolegen9629@gmail.com';
+    console.error('Usage: node grant-admin.js user@email.com');
+    console.error('   or: node grant-admin.js --username myhandle');
+    process.exit(1);
   }
 
   let user;

@@ -45,7 +45,6 @@ UniSolve/
 │   │   ├── components/      # Reusable UI components
 │   │   ├── pages/           # Route-level page components
 │   │   ├── services/        # API call wrappers
-│   │   ├── routes/          # React Router config
 │   │   └── utils/           # Shared utilities
 │   └── public/
 ├── unislove-backend/        # Express API server

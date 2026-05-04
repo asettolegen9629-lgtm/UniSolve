@@ -70,7 +70,7 @@ const Report = () => {
       })
 
       await reportsAPI.create(formData)
-      toast.success('Ваш новый репорт успешно отправлен и ждет официального публикацию через админ', {
+      toast.success('Your report was submitted and is pending admin approval.', {
         duration: 5000,
         style: {
           background: '#10b981',

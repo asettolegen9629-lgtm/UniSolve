@@ -1,37 +1,27 @@
-# UniSlove Flutter App
+# Flutter — UniSolve
 
-Flutter-клиент с экранами по вашему дизайну:
+Flutter client with screens aligned to the product design.
 
-- Dashboard
-- Notifications
-- New Report
-- Feedback
-- Profile
+## Quick start
 
-## Быстрый старт
-
-1. Установи Flutter SDK: [flutter.dev](https://docs.flutter.dev/get-started/install)
-2. В папке `flutter-app` выполни:
+1. Install the Flutter SDK: [flutter.dev](https://docs.flutter.dev/get-started/install)
+2. From `flutter-app/`:
 
 ```bash
 flutter pub get
 flutter run -d chrome
 ```
 
-или для Android:
+Or for Android:
 
 ```bash
 flutter run -d android
 ```
 
-## API
+## Defaults
 
-По умолчанию используется:
+The API base URL is configured in `lib/services/api_config.dart`.
 
-`http://localhost:3000/api`
+For the Android emulator you typically need `http://10.0.2.2:3000/api` instead of `localhost`.
 
-Для Android-эмулятора обычно нужен:
-
-`http://10.0.2.2:3000/api`
-
-Базовый URL меняется в `lib/services/api_config.dart`.
+Change the base URL in `lib/services/api_config.dart` for your environment.

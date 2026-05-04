@@ -128,7 +128,7 @@ const styles = {
   },
 };
 
-// Компонент звездного рейтинга
+// Star rating control component
 const StarRating = ({ reportId, currentRating, onRatingChange }) => {
   const [hoveredRating, setHoveredRating] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -189,7 +189,7 @@ const StarRating = ({ reportId, currentRating, onRatingChange }) => {
   );
 };
 
-// Карточка отзыва по одному решённому репорту
+// Feedback card for one resolved report
 const FeedbackCard = ({ 
   reportId,
   title, 
@@ -255,14 +255,14 @@ const FeedbackCard = ({
         </span>
       </div>
 
-      {/* Admin rating (если есть) */}
+      {/* Admin rating when present */}
       {adminRating != null && (
         <div style={{ marginBottom: '12px', fontSize: '14px', color: '#555' }}>
           Admin rating: <strong>{adminRating}/5</strong>
         </div>
       )}
 
-      {/* User rating - интерактивные звезды */}
+      {/* User rating — interactive stars */}
       <div style={{ marginBottom: '12px' }}>
         <div style={{ fontSize: '14px', color: '#555', marginBottom: '8px', fontWeight: 500 }}>
           Rate this resolution:
@@ -347,7 +347,7 @@ const FeedbackCard = ({
   );
 };
 
-// Основной компонент Feedback – показывает решённые репорты текущего пользователя
+// Feedback page: resolved reports for the signed-in user
 const Feedback = () => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -363,10 +363,10 @@ const Feedback = () => {
   useEffect(() => {
     const loadFeedback = async () => {
       try {
-        // Берём репорты текущего пользователя
+        // Load reports for the current user
         const myReports = await reportsAPI.getMyReports();
 
-        // Оставляем только решённые (status === 'done')
+        // Keep only resolved items (status === 'done')
         const solvedReports = (myReports || []).filter(
           (r) => (r.status || '').toLowerCase() === 'done'
         );

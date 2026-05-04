@@ -1,9 +1,14 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
+
 async function setupAdmin() {
   try {
-    const email = 'asettolegen9629@gmail.com';
-    console.log(`\n🔍 Ищу пользователя с email: ${email}`);
+    const email = process.env.SETUP_ADMIN_EMAIL;
+    if (!email || !String(email).trim()) {
+      console.log('Set SETUP_ADMIN_EMAIL in the environment (see .env.example).');
+      return;
+    }
+    console.log(`\nLooking up user with email: ${email}`);
     const user = await prisma.user.findUnique({
       where: { email },
       include: {
@@ -11,64 +16,63 @@ async function setupAdmin() {
         comments: true,
         reportLikes: true,
         commentLikes: true,
-        notifications: true
-      }
+        notifications: true,
+      },
     });
     if (!user) {
-      console.log(`❌ Пользователь с email ${email} не найден в базе данных.`);
-      console.log(`   Пользователь должен сначала войти через Clerk, чтобы создать запись в базе.`);
+      console.log(`No user found with email ${email}.`);
+      console.log('Sign in via Clerk once so a database row exists.');
       return;
     }
-    console.log(`\n✅ Пользователь найден:`);
+    console.log(`\nUser found:`);
     console.log(`   ID: ${user.id}`);
-    console.log(`   Имя: ${user.fullName}`);
+    console.log(`   Name: ${user.fullName}`);
     console.log(`   Username: @${user.username}`);
-    console.log(`   Текущий статус админа: ${user.isAdmin ? 'ДА ✅' : 'НЕТ ❌'}`);
-    console.log(`   Репортов: ${user.reports.length}`);
-    console.log(`   Комментариев: ${user.comments.length}`);
-    console.log(`   Лайков: ${user.reportLikes.length + user.commentLikes.length}`);
-    console.log(`   Уведомлений: ${user.notifications.length}`);
+    console.log(`   Admin flag: ${user.isAdmin ? 'YES' : 'NO'}`);
+    console.log(`   Reports: ${user.reports.length}`);
+    console.log(`   Comments: ${user.comments.length}`);
+    console.log(`   Likes: ${user.reportLikes.length + user.commentLikes.length}`);
+    console.log(`   Notifications: ${user.notifications.length}`);
     if (!user.isAdmin) {
-      console.log(`\n🔧 Делаю пользователя админом...`);
+      console.log(`\nGranting admin...`);
       await prisma.user.update({
         where: { email },
-        data: { isAdmin: true }
+        data: { isAdmin: true },
       });
-      console.log(`✅ Пользователь теперь админ!`);
+      console.log(`User is now an admin.`);
     } else {
-      console.log(`\n✅ Пользователь уже является админом.`);
+      console.log(`\nUser is already an admin.`);
     }
-    console.log(`\n🗑️  Удаляю данные пользователя...`);
+    console.log(`\nDeleting this user's content...`);
     const deletedNotifications = await prisma.notification.deleteMany({
-      where: { userId: user.id }
+      where: { userId: user.id },
     });
-    console.log(`   Удалено уведомлений: ${deletedNotifications.count}`);
+    console.log(`   Notifications deleted: ${deletedNotifications.count}`);
     const deletedCommentLikes = await prisma.commentLike.deleteMany({
-      where: { userId: user.id }
+      where: { userId: user.id },
     });
-    console.log(`   Удалено лайков на комментарии: ${deletedCommentLikes.count}`);
+    console.log(`   Comment likes deleted: ${deletedCommentLikes.count}`);
     const deletedReportLikes = await prisma.reportLike.deleteMany({
-      where: { userId: user.id }
+      where: { userId: user.id },
     });
-    console.log(`   Удалено лайков на репорты: ${deletedReportLikes.count}`);
+    console.log(`   Report likes deleted: ${deletedReportLikes.count}`);
     const deletedComments = await prisma.comment.deleteMany({
-      where: { userId: user.id }
+      where: { userId: user.id },
     });
-    console.log(`   Удалено комментариев: ${deletedComments.count}`);
+    console.log(`   Comments deleted: ${deletedComments.count}`);
     const deletedReports = await prisma.report.deleteMany({
-      where: { userId: user.id }
+      where: { userId: user.id },
     });
-    console.log(`   Удалено репортов: ${deletedReports.count}`);
-    console.log(`\n✅ Все данные пользователя удалены!`);
-    console.log(`\n📊 Итоговый статус:`);
+    console.log(`   Reports deleted: ${deletedReports.count}`);
+    console.log(`\nUser content cleared.`);
+    console.log(`\nSummary:`);
     console.log(`   Email: ${email}`);
-    console.log(`   Статус: АДМИН ✅`);
-    console.log(`   Данные: Очищены ✅`);
+    console.log(`   Role: ADMIN`);
+    console.log(`   Content: cleared`);
   } catch (error) {
-    console.error('❌ Ошибка:', error);
+    console.error('Error:', error);
   } finally {
     await prisma.$disconnect();
   }
 }
 setupAdmin();
-//

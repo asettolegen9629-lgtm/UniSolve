@@ -1,60 +1,53 @@
 #!/bin/bash
 
 # Initial setup helper for a fresh local machine.
-echo "🚀 Настройка проекта UniSolve..."
+echo "Setting up UniSolve..."
 
-# Установка зависимостей для frontend
-echo "📦 Установка зависимостей для frontend..."
+echo "Installing frontend dependencies..."
 cd client
 npm install
-#generate a setup.bat file
-# Создание .env для frontend если его нет
+
 if [ ! -f .env ]; then
-    echo "📝 Создание .env для frontend..."
-    cat > .env << EOF
-VITE_CLERK_PUBLISHABLE_KEY=pk_test_ZWxlZ2FudC1uZXd0LTQ3LmNsZXJrLmFjY291bnRzLmRldiQ
+    echo "Creating client/.env from .env.example..."
+    cp .env.example .env 2>/dev/null || cat > .env << EOF
+VITE_CLERK_PUBLISHABLE_KEY=pk_test_your_clerk_publishable_key_here
 VITE_API_URL=http://localhost:3000/api
 EOF
-    echo "✅ .env файл создан для frontend"
+    echo "Created client/.env — add your Clerk key from the Clerk dashboard."
 else
-    echo "✅ .env файл уже существует для frontend"
+    echo "client/.env already exists"
 fi
 
 cd ..
 
-# Установка зависимостей для backend
-echo "📦 Установка зависимостей для backend..."
+echo "Installing backend dependencies..."
 cd unislove-backend
 npm install
 
-# Создание .env для backend если его нет
 if [ ! -f .env ]; then
-    echo "📝 Создание .env для backend..."
+    echo "Creating unislove-backend/.env..."
     cat > .env << EOF
 DATABASE_URL="postgresql://postgres:postgres@localhost:5432/unislove_db?schema=public"
 PORT=3000
 EOF
-    echo "✅ .env файл создан для backend"
+    echo "Created unislove-backend/.env"
 else
-    echo "✅ .env файл уже существует для backend"
+    echo "unislove-backend/.env already exists"
 fi
 
-# Генерация Prisma клиента
-echo "🔧 Генерация Prisma клиента..."
+echo "Generating Prisma client..."
 npx prisma generate
 
-# Применение миграций базы данных
-echo "🗄️  Применение миграций базы данных..."
-echo "⚠️  Убедитесь, что PostgreSQL запущен и база данных unislove_db создана!"
-npx prisma db push || echo "⚠️  Не удалось применить миграции. Проверьте подключение к БД."
+echo "Applying database schema..."
+echo "Ensure PostgreSQL is running and database unislove_db exists."
+npx prisma db push || echo "Could not apply schema — check DATABASE_URL and PostgreSQL."
 
 cd ..
 
 echo ""
-echo "✅ Установка завершена!"
+echo "Setup finished."
 echo ""
-echo "📋 Для запуска проекта:"
-echo "   1. Терминал 1: cd unislove-backend && npm start"
-echo "   2. Терминал 2: cd client && npm run dev"
+echo "To run locally:"
+echo "  Terminal 1: cd unislove-backend && npm start"
+echo "  Terminal 2: cd client && npm run dev"
 echo ""
-

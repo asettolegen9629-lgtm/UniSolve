@@ -111,7 +111,7 @@ const ManageReports = () => {
       await reportsAPI.approve(reportId, approve);
       toast.success(approve ? 'Report approved and published! User will be notified.' : 'Report rejected! User will be notified.');
       setShowModal(false);
-      // Обновляем данные с небольшой задержкой для синхронизации с сервером
+      // Refresh after a short delay so the server state has settled
       setTimeout(() => {
         fetchReports();
       }, 500);
@@ -127,7 +127,7 @@ const ManageReports = () => {
       const statusLabel = newStatus === 'done' ? 'Solved' : newStatus === 'in-progress' ? 'In Progress' : newStatus;
       toast.success(`Report status changed to "${statusLabel}"! User will be notified.`);
       setShowModal(false);
-      // Обновляем данные с небольшой задержкой для синхронизации с сервером
+      // Refresh after a short delay so the server state has settled
       setTimeout(() => {
         fetchReports();
       }, 500);
@@ -154,7 +154,7 @@ const ManageReports = () => {
       await reportsAPI.verify(reportId, isVerified);
       toast.success(isVerified ? 'Report verified!' : 'Report unverified!');
       setShowModal(false);
-      // Обновляем данные с небольшой задержкой для синхронизации с сервером
+      // Refresh after a short delay so the server state has settled
       setTimeout(() => {
         fetchReports();
       }, 500);
@@ -172,7 +172,7 @@ const ManageReports = () => {
       await reportsAPI.delete(reportId);
       toast.success('Report deleted!');
       setShowModal(false);
-      // Обновляем данные с небольшой задержкой для синхронизации с сервером
+      // Refresh after a short delay so the server state has settled
       setTimeout(() => {
         fetchReports();
       }, 500);
@@ -194,8 +194,8 @@ const ManageReports = () => {
     return status === 'done' ? 'Solved' : status === 'in-progress' ? 'Being Solved' : 'New';
   };
 
-  // Используем useMemo для автоматического пересчета счетчиков при изменении reports
-  // ВАЖНО: хуки должны быть до условного возврата!
+  // useMemo recomputes counts when `reports` changes
+  // Hooks must run before any conditional return
   const pendingCount = useMemo(() => 
     reports.filter(r => !r.isApproved).length, 
     [reports]

@@ -3,11 +3,11 @@ const prisma = new PrismaClient();
 //
 async function seed() {
   try {
-    console.log('🌱 Добавление тестовых данных...');
+    console.log('Seeding sample data...');
 
     const existingReports = await prisma.report.count();
     if (existingReports > 0) {
-      console.log('✅ Тестовые данные уже существуют, пропускаем...');
+      console.log('Sample data already exists; skipping seed.');
       return;
     }
 
@@ -165,11 +165,11 @@ async function seed() {
       }
     }
 
-    console.log(`✅ Добавлено ${sampleReports.length} тестовых постов`);
-    console.log('✅ Тестовый пользователь создан: demo@unisolve.com');
-    console.log('✅ Тестовый админ создан: admin@unisolve.com');
+    console.log(`Added ${sampleReports.length} sample reports.`);
+    console.log('Demo user: demo@unisolve.com');
+    console.log('Demo admin: admin@unisolve.com');
   } catch (error) {
-    console.error('❌ Ошибка при добавлении тестовых данных:', error);
+    console.error('Seed error:', error);
   } finally {
     await prisma.$disconnect();
   }

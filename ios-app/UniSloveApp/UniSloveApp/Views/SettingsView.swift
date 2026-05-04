@@ -39,10 +39,10 @@ struct SettingsView: View {
                 }
             }
             .navigationTitle("Settings")
-            .alert("Сохранено", isPresented: $saved) {
+            .alert("Saved", isPresented: $saved) {
                 Button("OK", role: .cancel) {}
             } message: {
-                Text("Настройки API обновлены.")
+                Text("API settings were updated.")
             }
         }
     }
