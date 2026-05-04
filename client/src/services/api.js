@@ -18,14 +18,25 @@ export const API_ORIGIN = API_URL.replace(/\/api\/?$/, '');
 export const toAbsoluteApiUrl = (url) => {
   if (!url) return '';
   if (url.startsWith('http')) {
+    try {
+      const u = new URL(url);
+      const h = u.hostname.toLowerCase();
+      if (h === 'localhost' || h === '127.0.0.1') {
+        if (!API_ORIGIN) return url;
+        return `${API_ORIGIN}${u.pathname}${u.search}${u.hash}`;
+      }
+    } catch {
+      /* ignore parse errors, try regex fallback */
+    }
     const legacyLocal = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?\//i;
-    if (legacyLocal.test(url)) {
+    if (legacyLocal.test(url) && API_ORIGIN) {
       const pathOnly = url.replace(/^https?:\/\/[^/]+/, '');
       return `${API_ORIGIN}${pathOnly}`;
     }
     return url;
   }
-  return `${API_ORIGIN}${url}`;
+  if (!API_ORIGIN) return url;
+  return `${API_ORIGIN}${url.startsWith('/') ? '' : '/'}${url}`;
 };
 
 // Create axios instance with default config

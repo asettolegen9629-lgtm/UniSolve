@@ -112,7 +112,7 @@ const PostCard = ({post, isPending = false, isPopular = false}) => {
 
         {/* user info */}
         <div className='inline-flex items-center gap-3 cursor-pointer'>
-            <img src={post.user.profile_picture} alt="" className='w-10 h-10 rounded-full shadow'/>
+            <img src={toAbsoluteApiUrl(post.user.profile_picture)} alt="" className='w-10 h-10 rounded-full shadow'/>
             <div>
                 <div className='flex items-center space-x-1'>
                     <span>{post.user.full_name}</span>
@@ -205,9 +205,13 @@ const PostCard = ({post, isPending = false, isPopular = false}) => {
                 comments.map((comment) => (
                   <div key={comment.id} className='space-y-2'>
                     <div className='flex gap-3'>
-                      <img 
-                        src={comment.user?.profilePicture || comment.user?.profile_picture || 'https://via.placeholder.com/32'} 
-                        alt="" 
+                      <img
+                        src={
+                          toAbsoluteApiUrl(
+                            comment.user?.profilePicture || comment.user?.profile_picture || ''
+                          ) || 'https://via.placeholder.com/32'
+                        }
+                        alt=""
                         className='w-8 h-8 rounded-full'
                       />
                       <div className='flex-1'>
@@ -259,9 +263,13 @@ const PostCard = ({post, isPending = false, isPopular = false}) => {
                       <div className='ml-11 space-y-2 border-l-2 border-gray-200 pl-3'>
                         {comment.replies.map((reply) => (
                           <div key={reply.id} className='flex gap-3'>
-                            <img 
-                              src={reply.user?.profilePicture || reply.user?.profile_picture || 'https://via.placeholder.com/32'} 
-                              alt="" 
+                            <img
+                              src={
+                                toAbsoluteApiUrl(
+                                  reply.user?.profilePicture || reply.user?.profile_picture || ''
+                                ) || 'https://via.placeholder.com/32'
+                              }
+                              alt=""
                               className='w-6 h-6 rounded-full'
                             />
                             <div className='flex-1'>

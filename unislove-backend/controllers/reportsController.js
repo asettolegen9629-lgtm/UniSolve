@@ -1,5 +1,5 @@
 const prisma = require('../prismaClient');
-const { ensureUserRecord } = require('../utils/ensureUser');
+const { ensureUserRecord, attachClerkIdToExistingEmail } = require('../utils/ensureUser');
 const createReport = async (req, res) => {
   try {
     const clerkId = req.user?.clerkId || req.headers['x-clerk-user-id'] || 'guest_default';
@@ -10,6 +10,19 @@ const createReport = async (req, res) => {
       return res.status(403).json({ 
         error: 'Admins cannot create reports through the regular interface. Please use the admin panel.' 
       });
+    }
+    if (!user) {
+      const email = req.user?.email || req.headers['x-clerk-email'];
+      const username = req.user?.username || req.headers['x-clerk-username'];
+      const fullName = req.user?.fullName || req.headers['x-clerk-full-name'];
+      const profilePicture = req.user?.profilePicture || null;
+      if (email) {
+        const merged = await attachClerkIdToExistingEmail(clerkId, email, {
+          fullName: fullName || undefined,
+          profilePicture: profilePicture || undefined,
+        });
+        if (merged) user = merged;
+      }
     }
     if (!user) {
       const email = req.user?.email || req.headers['x-clerk-email'];

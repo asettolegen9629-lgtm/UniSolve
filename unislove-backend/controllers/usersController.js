@@ -1,5 +1,5 @@
 const prisma = require('../prismaClient');
-const { ensureUserRecord } = require('../utils/ensureUser');
+const { ensureUserRecord, attachClerkIdToExistingEmail, pickUniqueUsername } = require('../utils/ensureUser');
 const getOrCreateUser = async (req, res) => {
   try {
     const { clerkId, email, username, fullName, profilePicture } = req.body;
@@ -10,29 +10,46 @@ const getOrCreateUser = async (req, res) => {
       where: { clerkId }
     });
     if (!user) {
-      user = await prisma.user.create({
-        data: {
-          clerkId,
-          email,
-          username: username || email.split('@')[0],
-          fullName: fullName || username || email.split('@')[0],
-          profilePicture: profilePicture || null
-        }
+      const merged = await attachClerkIdToExistingEmail(clerkId, email, {
+        fullName: fullName || username || email.split('@')[0],
+        profilePicture: profilePicture ?? undefined,
       });
-    } else {
+      if (merged) {
+        user = merged;
+      } else {
+        const resolvedUsername = await pickUniqueUsername(username || email.split('@')[0], clerkId);
+        user = await prisma.user.create({
+          data: {
+            clerkId,
+            email,
+            username: resolvedUsername,
+            fullName: fullName || username || email.split('@')[0],
+            profilePicture: profilePicture || null
+          }
+        });
+      }
+    }
+    if (user) {
       user = await prisma.user.update({
         where: { clerkId },
         data: {
           email: email || user.email,
           username: username || user.username,
           fullName: fullName || user.fullName,
-          profilePicture: profilePicture || user.profilePicture
+          profilePicture: profilePicture !== undefined ? profilePicture : user.profilePicture
         }
       });
     }
     res.json(user);
   } catch (error) {
     console.error('Error in getOrCreateUser:', error);
+    if (error.code === 'P2002') {
+      const retry = await attachClerkIdToExistingEmail(req.body.clerkId, req.body.email, {
+        fullName: req.body.fullName,
+        profilePicture: req.body.profilePicture,
+      });
+      if (retry) return res.json(retry);
+    }
     res.status(500).json({ error: error.message });
   }
 };

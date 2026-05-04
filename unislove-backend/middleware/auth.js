@@ -25,23 +25,20 @@ const authenticateUser = async (req, res, next) => {
 
 const isAdmin = async (req, res, next) => {
   try {
-    const prisma = require('../prismaClient');
-    
-    // Quick debug logs help us understand why admin access fails in dev.
+    const { ensureUserRecord } = require('../utils/ensureUser');
+
     console.log('isAdmin check - clerkId:', req.user?.clerkId);
-    
-    const user = await prisma.user.findUnique({
-      where: { clerkId: req.user.clerkId }
-    });
-    
+
+    const user = await ensureUserRecord(req);
     console.log('isAdmin check - user found:', user ? 'YES' : 'NO');
     console.log('isAdmin check - isAdmin:', user?.isAdmin);
-    
+
     if (!user || !user.isAdmin) {
+      if (!user) console.log('isAdmin check - no user row after ensureUserRecord');
       console.log('isAdmin check - ACCESS DENIED');
       return res.status(403).json({ error: 'Admin access required' });
     }
-    
+
     console.log('isAdmin check - ACCESS GRANTED');
     req.user.dbUser = user;
     next();

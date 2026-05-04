@@ -31,7 +31,7 @@ const Feed = () => {
             _id: report.user?.id || 'unknown',
             full_name: report.user?.fullName || 'Unknown User',
             username: report.user?.username || 'unknown',
-            profile_picture: report.user?.profilePicture || ''
+            profile_picture: toAbsoluteApiUrl(report.user?.profilePicture || '')
           },
           content: report.description || '',
           image_urls: (report.images || []).map(img => {
@@ -67,7 +67,7 @@ const Feed = () => {
           _id: report.user?.id || 'unknown',
           full_name: report.user?.fullName || 'Unknown User',
           username: report.user?.username || 'unknown',
-          profile_picture: report.user?.profilePicture || ''
+          profile_picture: toAbsoluteApiUrl(report.user?.profilePicture || '')
         },
         content: report.description || '',
         image_urls: (report.images || []).map(img => {
